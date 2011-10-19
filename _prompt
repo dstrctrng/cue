@@ -1,0 +1,183 @@
+#!/bin/bash
+
+function git_project {
+    gitname=$(git config --list | grep remote.origin.name 2>&- | cut -d= -f2-)
+    [[ -z $gitname ]] && gitname=basename $(git config --list | grep remote.origin.url) .git 2>&-
+    echo "$gitname"
+}
+
+function git_branch {
+    git branch 2>&- | awk '$1 == "*" { print $2 }' || true
+} 
+
+function git_status {
+  gitstat=$(mktemp -t XXXXXX)
+  git status 2>/dev/null > $gitstat
+ 
+  if [[ $(grep -c "# Your branch is ahead" $gitstat) > 0 ]]; then
+    echo -n "^"
+  elif [[ $(grep -c "# Your branch is behind" $gitstat) > 0 ]]; then
+    echo -n "v"
+  else
+    echo -n ":"
+  fi
+
+  echo -n " "
+
+  if [[ $(grep -c "# Changes" $gitstat) > 0 ]]; then
+    num=$(sed -n '/^# Changes/,/^# [^ ]/p' $gitstat | grep '^#	' | wc -l | awk '{print $1}')
+    if [[ "$num" -gt 9 ]]; then
+      echo -n "!!{$num}!!"
+    else
+      while [[ "$num" > 0 ]]; do 
+          echo -n "!"
+          num=$((num -1))
+      done
+    fi
+  fi
+
+  if [[ $(grep -c "# Changed" $gitstat) > 0 ]]; then
+    num=$(sed -n '/^# Changed/,/^# [^ ]/p' $gitstat | grep '^#	' | wc -l | awk '{print 1}')
+    if [[ "$num" -gt 9 ]]; then
+      echo -n "??{$num}??"
+    else
+      while [[ "$num" > 0 ]]; do 
+          echo -n "?"
+          num=$((num -1))
+      done
+    fi
+  fi
+
+  if [[ $(grep -c "# Untracked" $gitstat) > 0 ]]; then
+    num=$(sed -n '/^# Untracked/,/^# [^ ]/p' $gitstat | grep '^#	' | wc -l | awk '{print $1}')
+    if [[ "$num" -gt 9 ]]; then
+      echo -n "**{$num}**"
+    else
+      while [[ "$num" > 0 ]]; do 
+          echo -n "*"
+          num=$((num -1))
+      done
+    fi
+  fi
+
+  rm -f $gitstat
+}
+
+function en {
+    while [[ -n $1 ]]; do
+        PS_MODE="$PS_MODE:$1"
+        enter-$1
+        shift
+    done
+}
+
+function leave {
+    [[ -z $PS_MODE ]] && return
+    _mode=${PS_MODE##*:}
+    leave-$_mode
+    PS_MODE="${PS_MODE%:*}"
+}
+
+function def_prompt {
+    LAST_ERROR="$?"
+
+    [[ -z $COLUMNS ]] && eval $(resize)
+    [[ -z $USER ]] && USER=$(whoami)
+
+    if [[ -f $HOME/.name ]]; then
+      hst_this=$(cat $HOME/.name)
+    else
+      hst_this=$(hostname | cut -d. -f1)
+    fi
+
+    if [[ $(whoami) = "root" ]]; then
+        clrBASE="$(color 172)"
+        clrSPECIAL="$(color 247)"
+        clrSPECIAL2="$(color 202)"
+        clrLINE="$(color 172)"
+        clrDARKER="$(color 238)"
+    else
+        clrBASE="$(color 247)"
+        clrSPECIAL="$(color 248)"
+        clrSPECIAL2="$(color 202)"
+        clrLINE="$(color 236)"
+        clrDARKER="$(color 238)"
+    fi
+
+    prnSTART="$clrSPECIAL"
+    prnEND="$(color 255)"
+
+    if [[ -n $LX_ORIGIN && -z $LZ_FROM ]]; then
+      LZ_SSH_TRAIL="/$LX_ORIGIN"
+      export LX_ORIGIN="$hst_this/$LX_ORIGIN"
+      export LZ_FROM="$hst_this"
+    elif [[ $LZ_FROM != $hst_this ]]; then
+      LZ_SSH_TRAIL=""
+      export LX_ORIGIN="$hst_this"
+      export LZ_FROM=$hst_this
+    fi
+
+    if [[ -n $LX_ORIGIN && $LX_ORIGIN != $LZ_FROM ]]; then
+        HOSTNAME_="$USER@$LX_ORIGIN"
+        prnHOSTNAME="$clrSPECIAL$USER@$hst_this$clrDARKER$LZ_SSH_TRAIL$clrLINE--$prnSTART"
+    else
+        HOSTNAME_="$USER@$hst_this"
+        prnHOSTNAME="$clrBASE$USER@$hst_this$prnSTART $clrLINE--"
+    fi
+
+    PSFILL="$clrLINE--"
+    PSINFO=""
+    prnPSINFO="" 
+
+    if [[ -n $LAST_ERROR && $LAST_ERROR != 0 ]]; then
+        clrERROR="$(color 196)"
+        prnPSINFO="$clrSPECIAL$clrERROR[$LAST_ERROR]$clrSPECIAL$prnSTART $prnPSINFO"
+        PSINFO="[$LAST_ERROR] $PSINFO"
+    fi
+
+    xHOME=$HOME
+    [[ -L $HOME ]] && xHOME=$(readlink $HOME)
+    if [[ $(eval echo ~$USER) != $xHOME ]]; then
+        prnPSINFO="-- $clrBASE${PWD}$prnSTART $prnPSINFO"
+        PSINFO="-- ${PWD} $PSINFO"
+    else
+        prnPSINFO="-- $clrBASE${PWD/$HOME/~}$prnSTART $prnPSINFO"
+        PSINFO="-- ${PWD/$HOME/~} $PSINFO"
+    fi
+
+    nm_branch=$(git_branch)
+    nm_project=$(git_project)
+    [[ -n $nm_branch ]] && {
+        gstatus=$(git_status)
+        if [[ ${gstatus% *} = ":" ]]; then
+            clrGITPUSH=$(color 245)
+        else
+            clrGITPUSH=$(color 214)
+        fi
+        prnPSINFO="$clrSPECIAL-- $clrBASE$nm_branch$clrGITPUSH${gstatus% *}$clrBASE$nm_project$(color 214)${gstatus#* }$clrSPECIAL$prnSTART $prnPSINFO"
+        PSINFO="-- $nm_branch${gstatus% *}$nm_project${gstatus#* } $PSINFO"
+    }
+
+   local len_prompt=$(echo -n "$PSINFO $HOSTNAME_ --" | wc -c | tr -d " ")
+    local len_rfill=$((COLUMNS - len_prompt - 3))
+    while [[ $len_rfill > 0 ]]; do
+        PSFILL="${PSFILL}-"
+        len_rfill=$((len_rfill - 1))
+    done
+     
+    if [[ $len_rfill < 0 ]]; then
+        local len_cut=$((3 - len_rfill))
+        PSINFO="...$(echo -n $PSINFO | sed -e "s/\(^.\{$len_cut\}\)\(.*\)/\2/")"
+    fi
+
+    prnMODE="$PS_MODE"
+
+    [[ -n "$_TITLE" ]] && title "$_TITLE"
+}
+ 
+PROMPT_COMMAND=def_prompt
+PS2="\$prnSTART > \$prnEND"
+PS1="\$prnSTART\$prnPSINFO\$PSFILL \$prnHOSTNAME\$prnEND\n-- \$SHLVL:\$HISTCMD \$prnMODE=> "
+ 
+# vim: ts=4 sw=4 et
+

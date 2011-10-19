@@ -1,0 +1,49 @@
+#!/bin/bash
+
+function cool {
+  stty sane > /dev/null
+  "$@"
+  stty sane > /dev/null
+  [[ -n $READLINE_LINE ]] && {
+    history -s "$READLINE_LINE"
+    READLINE_LINE=""
+  }
+}
+
+function cool_bundle {
+  cool bundle exec irb
+}
+
+function cool_vi {
+  if [[ -n $READLINE_LINE ]]; then
+    tmp=$(mktemp -t XXXXXX)
+    echo "$READLINE_LINE" > $tmp
+    history -s "$READLINE_LINE"
+    READLINE_LINE=""
+    vi $tmp
+    if [[ -s $tmp ]]; then
+      bash $tmp
+    fi
+    rm -f $tmp
+  else
+    vi
+  fi
+}
+
+function cool_grep {
+  if [[ -n $READLINE_LINE ]]; then
+    tmp=$(mktemp -t XXXXXX)
+    git grep "$READLINE_LINE" > $tmp
+    history -s "$READLINE_LINE"
+    READLINE_LINE=""
+    if [[ -s $tmp ]]; then
+      vi $tmp
+    fi
+    rm -f $tmp
+  fi
+}
+
+# TODO revisit bindings
+#bind -x '"\ew": cool_bundle'
+#bind -x '"\ev": cool_vi'
+#bind -x '"\e\t": cool_grep'
