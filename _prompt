@@ -1,8 +1,8 @@
 #!/bin/bash
 
 function git_project {
-    gitname=$(\git config --list | grep remote.origin.name 2>&- | cut -d= -f2-)
-    [[ -z $gitname ]] && gitname=basename $(\git config --list | grep remote.origin.url) .git 2>&-
+    gitname=$(\git config remote.origin.name)
+    [[ -z $gitname ]] && gitname=$(basename $(\git config remote.origin.url) .git)
     echo "$gitname"
 }
 
@@ -12,7 +12,7 @@ function git_branch {
 
 function git_status {
   gitstat=$(mktemp -t XXXXXX)
-  \git status 2>/dev/null > $gitstat
+  \git status --ignore-submodules=dirty 2>/dev/null > $gitstat
  
   if [[ $(grep -c "# Your branch is ahead" $gitstat) > 0 ]]; then
     echo -n "^"
