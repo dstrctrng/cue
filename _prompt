@@ -87,7 +87,10 @@ function def_prompt {
     if [[ -f $HOME/.name ]]; then
       hst_this=$(cat $HOME/.name)
     else
-      hst_this=$(hostname | cut -d. -f1)
+      hst_this=$(hostname | awk -F.  'BEGIN { OFS="."; } {$(NF-1)=""; $NF=""; print $0; }' | sed 's#[.]*$##')
+      if [[ -z $hst_this ]]; then
+        hst_this=$(hostname -s)
+      fi
     fi
 
     if [[ $(whoami) = "root" ]]; then
