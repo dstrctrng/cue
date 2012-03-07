@@ -63,21 +63,6 @@ function git_status {
   rm -f $gitstat
 }
 
-function en {
-    while [[ -n $1 ]]; do
-        PS_MODE="$PS_MODE:$1"
-        enter-$1
-        shift
-    done
-}
-
-function leave {
-    [[ -z $PS_MODE ]] && return
-    _mode=${PS_MODE##*:}
-    leave-$_mode
-    PS_MODE="${PS_MODE%:*}"
-}
-
 function def_prompt {
     LAST_ERROR="$?"
 
