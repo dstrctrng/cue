@@ -146,9 +146,9 @@ function def_prompt {
         PSINFO="-- $nm_branch${gstatus% *}$nm_project${gstatus#* } $PSINFO"
     }
 
-   local len_prompt=$(echo -n "$PSINFO $HOSTNAME_ --" | wc -c | tr -d " ")
+    local len_prompt=$(echo -n "$PSINFO $HOSTNAME_ --" | wc -c | tr -d " ")
     local len_rfill=$((COLUMNS - len_prompt - 3))
-    while [[ $len_rfill > 0 ]]; do
+    while [[ $len_rfill > 0 && ${len_rfill##-*}x != "x" ]]; do
         PSFILL="${PSFILL}-"
         len_rfill=$((len_rfill - 1))
     done
