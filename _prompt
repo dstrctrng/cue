@@ -147,7 +147,7 @@ function def_prompt {
     }
 
     local len_prompt=$(echo -n "$PSINFO $HOSTNAME_ --" | wc -c | tr -d " ")
-    local len_virtualenv=$(echo -n "($(basename $VIRTUAL_ENV))" | wc -c)
+    local len_virtualenv=0 #$(echo -n "($(basename $VIRTUAL_ENV))" | wc -c)
     local len_rfill=$((COLUMNS - len_prompt - 3 - len_virtualenv))
     while [[ $len_rfill > 0 && ${len_rfill##-*}x != "x" ]]; do
         PSFILL="${PSFILL}-"
