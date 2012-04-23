@@ -18,7 +18,7 @@ function dump_args {
 
 function main {
   local quality="$1"; shift
-  source "$shome/lib/_$quality" "$@"
+  require "$quality" "$@"
   dump_args "$@"
 }
 

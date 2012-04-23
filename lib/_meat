@@ -8,6 +8,11 @@ function check_help {
   fi
 }
 
+function require {
+  local library="$1"; shift
+  source "$shome/lib/_$library" "$@"
+}
+
 function _main {
   if [[ "$0" = "-bash" ]]; then
     echo 'ERROR: cannot source library without setting $shome'
