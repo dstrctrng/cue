@@ -1,5 +1,6 @@
 #!/bin/bash -e
-#/ Sources a meaty library and dumps arguments.  Takes no arguments.
+#/ Sources a meaty library and dumps arguments.
+#/ meat [...]
 
 shome="$(cd -P -- "$(dirname -- "$0")/.." && pwd -P)"
 source "$shome/lib/_meat" "$@"

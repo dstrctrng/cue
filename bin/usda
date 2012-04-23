@@ -19,10 +19,7 @@ function gamut {
   ../bin/meat "$@"
   popd > /dev/null
 
-  local OP=$PATH
-  PATH=$shome/bin:$OP
   meat "$@"
-  PATH=$OP
 }
 
 function main {
