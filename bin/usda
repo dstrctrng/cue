@@ -1,6 +1,12 @@
 #!/bin/bash
+#/ Runs the meat script in various directories to verify $shome is set correctly.
+#/ usda [ meat | prime ]
+#/   where meat = core library
+#/         prime = more stringent requirements
 
 shome="$(cd -P -- "$(dirname -- "$0")/.." && pwd -P)"
+source $shome/lib/_prime "$@"
+check_help "$@"
 
 function gamut {
   $shome/bin/meat "$@"
