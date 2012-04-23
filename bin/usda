@@ -1,8 +1,10 @@
 #!/bin/bash
-#/ Runs the meat script in various directories to verify $shome is set correctly.
-#/ usda [ meat | prime ]
-#/   where meat = core library
-#/         prime = more stringent requirements
+
+#/ NAME
+#/     usda -- runs test against meaty libraries
+#/
+#/ SYNOPSIS
+#/     usda
 
 shome="$(cd -P -- "$(dirname -- "$0")/.." && pwd -P)"
 source "$shome/lib/_prime" "$@"

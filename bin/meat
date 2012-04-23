@@ -1,6 +1,17 @@
 #!/bin/bash -e
-#/ Sources a meaty library and dumps arguments.
-#/ meat [...]
+
+#/ NAME
+#/     meat -- sources a meaty library and dump arguments
+#/
+#/ SYNOPSIS
+#/     meat [meat | prime ] [arguments ...]
+#/
+#/ DESCRIPTION
+#/     The first argument specifies which library to load:
+#/       * meat - core library
+#/       * prime - core library plus restrictions
+#/
+#/     The rest of the arguments are arbitrary.
 
 shome="$(cd -P -- "$(dirname -- "$0")/.." && pwd -P)"
 source "$shome/lib/_meat" "$@"
