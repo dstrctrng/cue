@@ -5,6 +5,16 @@ shome="$(cd -P -- "$(dirname -- "$0")/.." && pwd -P)"
 source "$shome/lib/_meat" "$@"
 check_help "$@"
 
+function dump_args {
+  echo "0' $shome"
+
+  local i=1
+  while [[ "$#" > 0 ]]; do
+    echo "$i: $1"; shift
+    i=$((i+1))
+  done
+}
+
 function main {
   local quality="$1"; shift
   source "$shome/lib/_$quality" "$@"
@@ -12,3 +22,4 @@ function main {
 }
 
 main "$@"
+
