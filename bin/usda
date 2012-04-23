@@ -1,10 +1,10 @@
 #!/bin/bash
 
 #/ NAME
-#/     usda -- runs test against meaty libraries
+#/     usda -- runs test against meaty libraries using arbitrary arguments
 #/
 #/ SYNOPSIS
-#/     usda
+#/     usda [arguments ...]
 
 shome="$(cd -P -- "$(dirname -- "$0")/.." && pwd -P)"
 source "$shome/lib/_prime" "$@"
