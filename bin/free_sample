@@ -1,24 +1,37 @@
-#!/bin/bash -e
+#!/bin/bash
 
 #/ NAME
 #/     free_sample -- template for a meaty script
 #/
 #/ SYNOPSIS
-#/     free_sample
+#/     free_sample --name NAME
 #/
 #/ DESCRIPTION
 #/     Describe command line arguments and options
 
 # figure out the project root under which bin, lib live
 shome="$(cd -P -- "$(dirname -- "$0")/.." && pwd -P)"
+
 # load a meat library
-source "$shome/lib/_prime" "$@"
+source "$shome/lib/_meat" "$@"
+
 # display --help from the comments starting with #/
-check_help "$@"
+#check_help "$@"
+
+# pull in extra libraries
+require "free_sample"
+
+# define command line options
+# var name, default, description, short option
+DEFINE_string 'name' 'World' 'name to say hello to' 'n'
 
 # entry point
 function main {
-  require "free_sample"
+  # parse the command-line
+  parse_command_line "$@" || exit 1
+
+  # say Hello!
+  echo "Hello, ${FLAGS_name}!"
 }
 
 # pass arguments to entry point

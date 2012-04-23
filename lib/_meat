@@ -13,6 +13,11 @@ function require {
   source "$shome/lib/_$library" "$@"
 }
 
+function parse_command_line {
+  FLAGS "$@" || return 1
+  eval set -- "${FLAGS_ARGV}"
+}
+
 function _main {
   if [[ "$0" = "-bash" ]]; then
     echo 'ERROR: cannot source library without setting $shome'
