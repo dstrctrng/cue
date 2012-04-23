@@ -1,0 +1,22 @@
+#!/bin/bash
+
+shome="$(cd -P -- "$(dirname -- "$0")/.." && pwd -P)"
+
+function gamut {
+  $shome/bin/meat "$@"
+
+  pushd $shome/bin > /dev/null
+  ./meat "$@"
+  popd > /dev/null
+
+  pushd $shome/lib > /dev/null
+  ../bin/meat "$@"
+  popd > /dev/null
+
+  OP=$PATH
+  PATH=$shome/bin:$OP
+  meat "$@"
+  PATH=$OP
+}
+
+gamut "$@" | sort | uniq -c

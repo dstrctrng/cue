@@ -1,0 +1,9 @@
+#!/bin/bash
+
+echo "0' $shome"
+i=1
+while [[ -n $1 ]]; do
+  echo "$i: $1"; shift
+  i=$((i+1))
+done
+

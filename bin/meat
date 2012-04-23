@@ -1,0 +1,4 @@
+#!/bin/bash -e
+
+shome="$(cd -P -- "$(dirname -- "$0")/.." && pwd -P)"
+source $shome/lib/_meat "$@"
