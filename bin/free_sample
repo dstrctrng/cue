@@ -1,0 +1,25 @@
+#!/bin/bash -e
+
+#/ NAME
+#/     free_sample -- template for a meaty script
+#/
+#/ SYNOPSIS
+#/     free_sample
+#/
+#/ DESCRIPTION
+#/     Describe command line arguments and options
+
+# figure out the project root under which bin, lib live
+shome="$(cd -P -- "$(dirname -- "$0")/.." && pwd -P)"
+# load a meat library
+source "$shome/lib/_prime" "$@"
+# display --help from the comments starting with #/
+check_help "$@"
+
+# entry point
+function main {
+  require "free_sample"
+}
+
+# pass arguments to entry point
+main "$@"
