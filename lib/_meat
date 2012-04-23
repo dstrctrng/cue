@@ -11,7 +11,8 @@ fi
   
 function dump_args {
   echo "0' $shome"
-  i=1
+
+  local i=1
   while [[ "$#" > 0 ]]; do
     echo "$i: $1"; shift
     i=$((i+1))
