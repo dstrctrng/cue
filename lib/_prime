@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -fue
-
 if [[ "$0" = "-bash" ]]; then
   echo 'ERROR: cannot source library without setting $shome'
   exit 1
@@ -12,3 +10,5 @@ if [[ -z "$shome" ]]; then
 fi
   
 source "$shome/lib/_meat" "$@"
+set -fue
+

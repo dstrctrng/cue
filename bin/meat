@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash
 
 #/ NAME
 #/     meat -- sources a meaty library and dump arguments

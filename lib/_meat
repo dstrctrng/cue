@@ -23,6 +23,8 @@ function _main {
     shome="$(cd -P -- "$(dirname -- "$0")/.." && pwd -P)"
   fi
 
+  require "shflags"
+
   PATH="$shome/bin:$PATH"
 }
 
