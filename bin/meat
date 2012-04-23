@@ -5,6 +5,10 @@ shome="$(cd -P -- "$(dirname -- "$0")/.." && pwd -P)"
 source "$shome/lib/_meat" "$@"
 check_help "$@"
 
-quality="$1"; shift
-source "$shome/lib/_$quality" "$@"
-dump_args "$@"
+function main {
+  local quality="$1"; shift
+  source "$shome/lib/_$quality" "$@"
+  dump_args "$@"
+}
+
+main "$@"

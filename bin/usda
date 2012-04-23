@@ -19,13 +19,15 @@ function gamut {
   ../bin/meat "$@"
   popd > /dev/null
 
-  OP=$PATH
+  local OP=$PATH
   PATH=$shome/bin:$OP
   meat "$@"
   PATH=$OP
 }
 
-{
+function main {
   gamut meat "$@"
   gamut prime "$@"
-} | sort | uniq -c
+}
+
+main "$@" | sort | uniq -c
