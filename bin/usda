@@ -7,17 +7,13 @@
 #/     usda one two three
 
 shome="$(cd -P -- "$(dirname -- "$0")/.." && pwd -P)"
-source "$shome/lib/_prime" "$@"
+source "$shome/bin/_prime" "$@"
 
 function gamut {
   "$shome/bin/meat" "$@"
 
   pushd "$shome/bin" > /dev/null
   ./meat "$@"
-  popd > /dev/null
-
-  pushd "$shome/lib" > /dev/null
-  ../bin/meat "$@"
   popd > /dev/null
 
   meat "$@"

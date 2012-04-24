@@ -12,7 +12,7 @@
 #/     The arguments are arbitrary.
 
 shome="$(cd -P -- "$(dirname -- "$0")/.." && pwd -P)"
-source "$shome/lib/_meat" "$@"
+source "$shome/bin/_meat" "$@"
 
 function dump_args {
   echo "0' $shome"

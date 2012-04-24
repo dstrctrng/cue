@@ -11,7 +11,7 @@
 shome="$(cd -P -- "$(dirname -- "$0")/.." && pwd -P)"
 
 # load a meat library
-source "$shome/lib/_meat" "$@"
+source "$shome/bin/_meat" "$@"
 
 # pull in extra libraries
 require "free_sample"
