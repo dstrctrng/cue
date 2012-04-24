@@ -15,7 +15,7 @@ function display_help {
 
 function require {
   local library="$1"; shift
-  source "$shome/lib/_$library" "$@"
+  source "$shome/bin/_$library" "$@"
 }
 
 function parse_command_line {
