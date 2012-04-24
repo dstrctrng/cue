@@ -36,9 +36,7 @@ function main {
   dump_args "$@"
 }
 
-set +e
 DEFINE_boolean 'prime' 'false' 'enable more restrictions'
-set -e
 
 parse_command_line "$@" || exit $?
 eval set -- "${FLAGS_ARGV}"

@@ -24,9 +24,7 @@ function main {
 
 # define command line options:
 #   var name, default, description, short option
-set +e
 DEFINE_string 'name' 'World' 'name to say hello to' 'n'
-set -e
 
 # parse the command-line
 parse_command_line "$@" || exit $?
