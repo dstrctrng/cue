@@ -4,11 +4,10 @@
 #/     usda -- runs test against meaty libraries using arbitrary arguments
 #/
 #/ SYNOPSIS
-#/     usda [arguments ...]
+#/     usda one two three
 
 shome="$(cd -P -- "$(dirname -- "$0")/.." && pwd -P)"
 source "$shome/lib/_prime" "$@"
-check_help "$@"
 
 function gamut {
   "$shome/bin/meat" "$@"
@@ -25,8 +24,10 @@ function gamut {
 }
 
 function main {
-  gamut meat "$@"
-  gamut prime "$@"
+  gamut "$@"
+  gamut --prime "$@"
 }
 
+parse_command_line "$@" || exit $?
+eval set -- "${FLAGS_ARGV}"
 main "$@" | sort | uniq -c

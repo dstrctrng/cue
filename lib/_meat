@@ -21,12 +21,13 @@ function require {
 function parse_command_line {
   if ! FLAGS "$@"; then
     if [[ "$flags_error" = "help requested" ]]; then
+      echo ""
+      display_help
       exit 0
     fi
     
     return $?
   fi
-  eval set -- "${FLAGS_ARGV}"
   return 0
 }
 

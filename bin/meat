@@ -4,18 +4,15 @@
 #/     meat -- sources a meaty library and dump arguments
 #/
 #/ SYNOPSIS
-#/     meat [meat | prime ] [arguments ...]
+#/     meat the stuff you get at safeway
+#/     meat --prime japanese kobe steak
 #/
 #/ DESCRIPTION
-#/     The first argument specifies which library to load:
-#/       * meat - core library
-#/       * prime - core library plus restrictions
 #/
-#/     The rest of the arguments are arbitrary.
+#/     The arguments are arbitrary.
 
 shome="$(cd -P -- "$(dirname -- "$0")/.." && pwd -P)"
 source "$shome/lib/_meat" "$@"
-check_help "$@"
 
 function dump_args {
   echo "0' $shome"
@@ -28,9 +25,19 @@ function dump_args {
 }
 
 function main {
-  local quality="$1"; shift
+  local quality="meat"
+
+  if [[ "$FLAGS_prime" = "$FLAGS_TRUE" ]]; then
+    quality="prime"
+  fi
+
   require "$quality" "$@"
+
   dump_args "$@"
 }
 
+DEFINE_boolean 'prime' 'false' 'enable more restrictions'
+
+parse_command_line "$@" || exit $?
+eval set -- "${FLAGS_ARGV}"
 main "$@"
