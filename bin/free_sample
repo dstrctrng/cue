@@ -32,7 +32,7 @@ parse_command_line "$@" || exit $?
 eval set -- "${FLAGS_ARGV}"
 
 if [[ "$#" = 0 ]]; then
-  echo "ERROR: missing script name"
+  logger_error "missing script name"
   display_help
   exit 1
 fi
