@@ -41,16 +41,7 @@ function parse_command_line {
   return 0
 }
 
-function _main {
-  if [[ "$0" = "-bash" ]]; then
-    echo 'ERROR: cannot source library without setting $shome'
-    exit 1
-  fi
-
-  if [[ -z "$shome" ]]; then
-    shome="$(cd -P -- "$(dirname -- "$0")/.." && pwd -P)"
-  fi
-
+function configure_logging {
   # load log4sh (disabling properties file warning) and clear the default
   # configuration
   LOG4SH_CONFIGURATION='none' require 'log4sh'
@@ -65,9 +56,22 @@ function _main {
   appender_setType stderr FileAppender
   appender_file_setFile stderr STDERR
   appender_activateOptions stderr
-  
+}
+
+function _main {
+  if [[ "$0" = "-bash" ]]; then
+    echo 'ERROR: cannot source library without setting $shome'
+    exit 1
+  fi
+
+  if [[ -z "$shome" ]]; then
+    shome="$(cd -P -- "$(dirname -- "$0")/.." && pwd -P)"
+  fi
+
   require 'shflags'
 
+  configure_logging
+  
   PATH="$shome/bin:$PATH"
 }
 
