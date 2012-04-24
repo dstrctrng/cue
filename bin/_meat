@@ -26,7 +26,7 @@ function parse_command_line {
       exit 0
     fi
     
-    return $?
+    return 4
   fi
   return 0
 }
