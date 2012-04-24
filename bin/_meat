@@ -1,5 +1,11 @@
 #!/bin/bash
 
+: ${__meat__:=x}
+if [[ "$__meat__" != 'x' ]]; then
+  return 0
+fi
+__meat__='y'
+
 function check_help {
   # taken from shocco
   if expr -- "$*" : ".*--help" >/dev/null; then
@@ -13,9 +19,13 @@ function display_help {
   grep '^#/' <"$shome/bin/$(basename -- "$0")" | cut -c4-
 }
 
-function require {
+function which_library {
   local library="$1"; shift
-  source "$shome/bin/_$library" "$@"
+  echo "$shome/bin/_$library"
+}
+
+function require {
+  source "$(which_library "$@")"
 }
 
 function parse_command_line {
@@ -41,7 +51,21 @@ function _main {
     shome="$(cd -P -- "$(dirname -- "$0")/.." && pwd -P)"
   fi
 
-  require 'log4sh'
+  # load log4sh (disabling properties file warning) and clear the default
+  # configuration
+  LOG4SH_CONFIGURATION='none' require 'log4sh'
+  log4sh_resetConfiguration
+
+  # set the global logging level to INFO
+  logger_setLevel INFO
+
+  # add and configure a FileAppender that outputs to STDERR, and activate the
+  # configuration
+  logger_addAppender stderr
+  appender_setType stderr FileAppender
+  appender_file_setFile stderr STDERR
+  appender_activateOptions stderr
+  
   require 'shflags'
 
   PATH="$shome/bin:$PATH"
