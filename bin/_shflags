@@ -790,12 +790,12 @@ _flags_parseGetopt()
 # and whose short name was 'x', and the default value was 'false'. This flag
 # could be explicitly set to 'true' with '--update' or by '-x', and it could be
 # explicitly set to 'false' with '--noupdate'.
-DEFINE_boolean() { _flags_define ${__FLAGS_TYPE_BOOLEAN} "$@"; }
+DEFINE_boolean() { _flags_define ${__FLAGS_TYPE_BOOLEAN} "$@" || return "$?"; }
 
 # Other basic flags.
-DEFINE_float()   { _flags_define ${__FLAGS_TYPE_FLOAT} "$@"; }
-DEFINE_integer() { _flags_define ${__FLAGS_TYPE_INTEGER} "$@"; }
-DEFINE_string()  { _flags_define ${__FLAGS_TYPE_STRING} "$@"; }
+DEFINE_float()   { _flags_define ${__FLAGS_TYPE_FLOAT} "$@" || return "$?"; }
+DEFINE_integer() { _flags_define ${__FLAGS_TYPE_INTEGER} "$@" || return "$?"; }
+DEFINE_string()  { _flags_define ${__FLAGS_TYPE_STRING} "$@" || return "$?"; }
 
 # Parse the flags.
 #
