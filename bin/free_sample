@@ -28,7 +28,7 @@ DEFINE_string 'name' 'World' 'name to say hello to' 'n'
 # entry point
 function main {
   # parse the command-line
-  parse_command_line "$@" || exit 1
+  parse_command_line "$@" || exit $?
 
   # say Hello!
   echo "Hello, ${FLAGS_name}!"

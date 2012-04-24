@@ -3,9 +3,14 @@
 function check_help {
   # taken from shocco
   if expr -- "$*" : ".*--help" >/dev/null; then
-    grep '^#/' <"$shome/bin/$(basename -- "$0")" | cut -c4-
+    display_help
     exit 0
   fi
+}
+
+function display_help {
+  # taken from shocco
+  grep '^#/' <"$shome/bin/$(basename -- "$0")" | cut -c4-
 }
 
 function require {
@@ -14,8 +19,15 @@ function require {
 }
 
 function parse_command_line {
-  FLAGS "$@" || return 1
+  if ! FLAGS "$@"; then
+    if [[ "$flags_error" = "help requested" ]]; then
+      exit 0
+    fi
+    
+    return $?
+  fi
   eval set -- "${FLAGS_ARGV}"
+  return 0
 }
 
 function _main {
