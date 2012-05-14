@@ -169,6 +169,6 @@ versions_main()
   done
 }
 
-if [ "`basename $0`" = 'versions' ]; then
+if [ "`basename -- $0`" = 'versions' ]; then
   versions_main "$@"
 fi

@@ -21,7 +21,11 @@ function display_help {
 
 function which_library {
   local library="$1"; shift
-  echo "$shome/bin/_$library"
+  if [[ -r "$shome/bin/_$library" ]]; then
+    echo "$shome/bin/_$library"
+  elif [[ -r "$shome/.$library/.profile" ]]; then
+    echo "$shome/.$library/.profile"
+  fi
 }
 
 function require {
@@ -59,7 +63,7 @@ function configure_logging {
 }
 
 function _main {
-  if [[ "$0" = "-bash" ]]; then
+  if [[ "$0" = "-bash" && -z "$shome" ]]; then
     echo 'ERROR: cannot source library without setting $shome'
     exit 1
   fi

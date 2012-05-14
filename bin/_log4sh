@@ -117,7 +117,7 @@ unset _log4sh_const
 # internal variables
 #
 
-__log4sh_filename=`basename $0`
+__log4sh_filename=`basename -- $0`
 __log4sh_tmpDir=''
 __log4sh_trapsFile=''
 
