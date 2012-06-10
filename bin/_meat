@@ -1,0 +1,82 @@
+#!/bin/bash
+
+: ${__meat__:=x}
+if [[ "$__meat__" != 'x' ]]; then
+  return 0
+fi
+__meat__='y'
+
+function check_help {
+  # taken from shocco
+  if expr -- "$*" : ".*--help" >/dev/null; then
+    display_help
+    exit 0
+  fi
+}
+
+function display_help {
+  # taken from shocco
+  grep '^#/' <"$shome/bin/$(basename -- "$0")" | cut -c4-
+}
+
+function which_library {
+  local library="$1"; shift
+  if [[ -r "$shome/bin/_$library" ]]; then
+    echo "$shome/bin/_$library"
+  elif [[ -r "$shome/.$library/.profile" ]]; then
+    echo "$shome/.$library/.profile"
+  fi
+}
+
+function require {
+  source "$(which_library "$@")"
+}
+
+function parse_command_line {
+  if ! FLAGS "$@"; then
+    if [[ "$flags_error" = "help requested" ]]; then
+      echo ""
+      display_help
+      exit 0
+    fi
+    
+    return 4
+  fi
+  return 0
+}
+
+function configure_logging {
+  # load log4sh (disabling properties file warning) and clear the default
+  # configuration
+  LOG4SH_CONFIGURATION='none' require 'log4sh'
+  log4sh_resetConfiguration
+
+  # set the global logging level to INFO
+  logger_setLevel INFO
+
+  # add and configure a FileAppender that outputs to STDERR, and activate the
+  # configuration
+  logger_addAppender stderr
+  appender_setType stderr FileAppender
+  appender_file_setFile stderr STDERR
+  appender_activateOptions stderr
+}
+
+function _main {
+  if [[ "$0" = "-bash" && -z "$shome" ]]; then
+    echo 'ERROR: cannot source library without setting $shome'
+    exit 1
+  fi
+
+  if [[ -z "$shome" ]]; then
+    shome="$(cd -P -- "$(dirname -- "$0")/.." && pwd -P)"
+  fi
+
+  require 'shflags'
+
+  configure_logging
+  
+  PATH="$shome/bin:$PATH"
+}
+
+_main "$@"
