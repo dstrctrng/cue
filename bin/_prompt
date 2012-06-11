@@ -1,5 +1,12 @@
 #!/bin/bash
 
+_esc="$(perl -e 'printf "%c", 27')"
+_bell="$(perl -e 'printf "%c", 7')"
+
+function color { echo -n "$_esc[38;5;${1}m"; }
+function bgcolor { echo -n "$_esc[48;5;${1}m"; }
+function title { echo -n "$_esc]2;${1}$_bell"; }
+
 function git_project {
     gitname=$(\git config remote.origin.name)
     [[ -z $gitname ]] && gitname=$(basename $(\git config remote.origin.url) .git)
@@ -164,9 +171,4 @@ function def_prompt {
     [[ -n "$_TITLE" ]] && title "$_TITLE"
 }
  
-PROMPT_COMMAND=def_prompt
-PS2="\$prnSTART > \$prnEND"
-PS1="\$prnSTART\$prnPSINFO\$PSFILL \$prnHOSTNAME\$prnEND\n-- \$SHLVL:\$HISTCMD \$prnMODE=> "
- 
 # vim: ts=4 sw=4 et
-
