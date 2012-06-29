@@ -6,6 +6,12 @@ if [[ "$__meat__" != 'x' ]]; then
 fi
 __meat__='y'
 
+# if getting-started bootstrap is detected, put this in the path
+# mainly useful for getopt on os x
+if [[ -d "$HOME/.getting-started/bootstrap" ]]; then
+  PATH="$PATH:$HOME/.getting-started/bootstrap"
+fi
+
 function check_help {
   # taken from shocco
   if expr -- "$*" : ".*--help" >/dev/null; then
