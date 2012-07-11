@@ -44,6 +44,10 @@ function display_man {
   awk '/^__MAN__/,/^MAN$/ {print}' <"$shome/bin/$(basename -- "$0")" | tail -n +2 | egrep -v '^MAN$'
 }
 
+function display_synopsis {
+  awk '/^#/ && !/^#!/ { print } /^[^#]/ || /^$/ { exit }' <"$shome/bin/$(basename -- "$0")" | cut -c3-
+}
+
 function which_library {
   local library="$1"; shift
   if [[ -r "$shome/bin/_$library" ]]; then
