@@ -1,0 +1,34 @@
+#!/bin/bash
+
+#/ NAME
+#/     venv -- runs under virtualenv
+#/
+#/ SYNOPSIS
+#/     venv command args..
+
+# figure out the project root under which bin, lib live
+shome="$(cd -P -- "$(dirname -- "$0")/.." && pwd -P)"
+
+# load a meat library
+source "$shome/bin/_prime" "$@"
+
+# entry point
+function main {
+  if [[ ! -d $shome/.doc/.virtualenv ]]; then
+    (cd $shome/.doc && tar xfz virtualenv-pygmentize.tgz)
+  fi
+
+  export VIRTUAL_ENV_DISABLE_PROMPT=1
+  source $shome/.doc/.virtualenv/bin/activate
+  exec "$@"
+}
+
+# define command line options:
+#   var name, default, description, short option
+
+# parse the command-line
+#parse_command_line "$@" || exit $?
+#eval set -- "${FLAGS_ARGV}"
+
+# pass arguments to entry point
+main "$@"

@@ -6,6 +6,12 @@ if [[ "$__meat__" != 'x' ]]; then
 fi
 __meat__='y'
 
+# if getting-started bootstrap is detected, put this in the path
+# mainly useful for getopt on os x
+if [[ -d "$HOME/.getting-started/bootstrap" ]]; then
+  PATH="$PATH:$HOME/.getting-started/bootstrap"
+fi
+
 function check_help {
   # taken from shocco
   if expr -- "$*" : ".*--help" >/dev/null; then
@@ -17,6 +23,25 @@ function check_help {
 function display_help {
   # taken from shocco
   grep '^#/' <"$shome/bin/$(basename -- "$0")" | cut -c4-
+}
+
+# Exits the script with the last error code.  Servers as a marker in $0 to
+# begin ronn documentation until end of file.
+function __MAN__ {
+  exit "$!"
+}
+
+# Extracts ronn-style Markdown after __MAN__ to stdout.  If a line is "MAN", it
+# is assumed that a here document is used (for syntactical reasons).
+#
+# A limitation of detecting "MAN" will truncate the Markdown if "MAN" is a
+# legimate text.
+#
+#     __MAN__ << "MAN"
+#     raw ronn-style Markdown
+#     MAN
+function display_man {
+  awk '/^__MAN__/,/^MAN$/ {print}' <"$shome/bin/$(basename -- "$0")" | tail -n +2 | egrep -v '^MAN$'
 }
 
 function which_library {

@@ -1,0 +1,56 @@
+#!/bin/bash
+
+#/ NAME
+#/     watch -- watch jekyll and compass
+#/
+#/ SYNOPSIS
+#/     watch site
+
+# figure out the project root under which bin, lib live
+shome="$(cd -P -- "$(dirname -- "$0")/.." && pwd -P)"
+
+# load a meat library
+source "$shome/bin/_prime" "$@"
+
+# entry point
+function main {
+  if [[ "$#" < 1 ]]; then
+    logger_fatal "missing component(s)"
+    exit 1
+  fi
+
+  local nm_component="$1"; shift
+  case "$nm_component" in 
+    site)
+      watch_site "$@"
+      ;;
+    *)
+      logger_fatal "don't know how to build ${nm_component}"
+      exit 1
+      ;;
+  esac
+}
+
+function watch_site {
+  export BUNDLE_GEMFILE="$shome/.doc/Gemfile"
+  bundle check 2>&1 >/dev/null || { bundle install --quiet --local --path vendor/bundle || bundle check > /dev/null; }
+
+  local old_path="$PATH"
+  PATH="$PATH:$shome/libexec"
+
+  pushd "$shome/site" > /dev/null
+  bundle exec foreman start
+  popd > /dev/null
+
+  PATH="$old_path"
+}
+
+# define command line options:
+#   var name, default, description, short option
+
+# parse the command-line
+parse_command_line "$@" || exit $?
+eval set -- "${FLAGS_ARGV}"
+
+# pass arguments to entry point
+main "$@"
