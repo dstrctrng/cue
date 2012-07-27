@@ -60,7 +60,10 @@ function which_library {
 }
 
 function require {
-  source "$(which_library "$@")"
+  local pth_lib="$(which_library "$@")"
+  if [[ -r "$pth_lib" ]]; then
+    source "$pth_lib"
+  fi
 }
 
 function parse_command_line {
