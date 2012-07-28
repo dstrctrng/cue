@@ -170,5 +170,8 @@ function def_prompt {
 
     [[ -n "$_TITLE" ]] && title "$_TITLE"
 }
+
+PS2="\$prnSTART > \$prnEND"
+PS1="\$prnSTART\$prnPSINFO\$PSFILL \$prnHOSTNAME\$prnEND\n-- \$SHLVL:\$HISTCMD \$prnMODE=> "
  
 # vim: ts=4 sw=4 et
