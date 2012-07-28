@@ -1,12 +1,5 @@
 #!/bin/bash
 
-_esc="$(perl -e 'printf "%c", 27')"
-_bell="$(perl -e 'printf "%c", 7')"
-
-function color { echo -n "$_esc[38;5;${1}m"; }
-function bgcolor { echo -n "$_esc[48;5;${1}m"; }
-function title { echo -n "$_esc]2;${1}$_bell"; }
-
 function git_project {
     gitname=$(\git config remote.origin.name)
     [[ -z $gitname ]] && gitname=$(basename $(\git config remote.origin.url) .git)
@@ -85,22 +78,14 @@ function def_prompt {
       fi
     fi
 
-    if [[ $(whoami) = "root" ]]; then
-        clrBASE="$(color 172)"
-        clrSPECIAL="$(color 247)"
-        clrSPECIAL2="$(color 202)"
-        clrLINE="$(color 172)"
-        clrDARKER="$(color 238)"
-    else
-        clrBASE="$(color 247)"
-        clrSPECIAL="$(color 248)"
-        clrSPECIAL2="$(color 202)"
-        clrLINE="$(color 236)"
-        clrDARKER="$(color 238)"
-    fi
+    clrBASE="$sdhigh"
+    clrLINE="$sdtext"
+    clrDARKER="$sdcomment"
+    clrSPECIAL="$sdtext"
+    clrSPECIAL2="$sorange"
 
-    prnSTART="$clrSPECIAL"
-    prnEND="$(color 255)"
+    prnSTART="$sdtext"
+    prnEND="$sdtext"
 
     if [[ -n $LX_ORIGIN && -z $LZ_FROM ]]; then
       LZ_SSH_TRAIL="/$LX_ORIGIN"
@@ -125,7 +110,7 @@ function def_prompt {
     prnPSINFO="" 
 
     if [[ -n $LAST_ERROR && $LAST_ERROR != 0 ]]; then
-        clrERROR="$(color 196)"
+        clrERROR="$sred"
         prnPSINFO="$clrSPECIAL$clrERROR[$LAST_ERROR]$clrSPECIAL$prnSTART $prnPSINFO"
         PSINFO="[$LAST_ERROR] $PSINFO"
     fi
@@ -145,11 +130,11 @@ function def_prompt {
     [[ -n $nm_branch ]] && {
         gstatus=$(git_status)
         if [[ ${gstatus% *} = ":" ]]; then
-            clrGITPUSH=$(color 245)
+            clrGITPUSH="$sorange"
         else
-            clrGITPUSH=$(color 214)
+            clrGITPUSH="$sorange"
         fi
-        prnPSINFO="$clrSPECIAL-- $clrBASE$nm_branch$clrGITPUSH${gstatus% *}$clrBASE$nm_project$(color 214)${gstatus#* }$clrSPECIAL$prnSTART $prnPSINFO"
+        prnPSINFO="$clrSPECIAL-- $clrBASE$nm_branch$clrGITPUSH${gstatus% *}$clrBASE$nm_project${sorange}${gstatus#* }$clrSPECIAL$prnSTART $prnPSINFO"
         PSINFO="-- $nm_branch${gstatus% *}$nm_project${gstatus#* } $PSINFO"
     }
 
@@ -167,8 +152,6 @@ function def_prompt {
     fi
 
     prnMODE="$PS_MODE"
-
-    [[ -n "$_TITLE" ]] && title "$_TITLE"
 }
 
 PS2="\$prnSTART > \$prnEND"

@@ -87,3 +87,12 @@ sltext="$(_ansi "$_sbase00")"
 slcomment="$(_ansi "$_sbase1")"
 slhigh="$(_ansi "$_sbase01")"
 
+syellow="$(_ansi "$_syellow")"
+sorange="$(_ansi "$_sorange")"
+sred="$(_ansi "$_sred")"
+smagenta="$(_ansi "$_smagenta")"
+sviolet="$(_ansi "$_sviolet")"
+sblue="$(_ansi "$_sblue")"
+scyan="$(_ansi "$_scyan")"
+sgreen="$(_ansi "$_sgreen")"
+
