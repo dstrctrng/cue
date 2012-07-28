@@ -1,13 +1,15 @@
 #!/bin/bash
 
 function git_project {
-    gitname=$(\git config remote.origin.name)
-    [[ -z $gitname ]] && gitname=$(basename $(\git config remote.origin.url) .git)
-    echo "$gitname"
+  gitname=$(\git config remote.origin.name)
+  if [[ -z $gitname ]]; then
+    gitname=$(basename $(\git config remote.origin.url) .git)
+  fi
+  echo "$gitname"
 }
 
 function git_branch {
-    \git branch 2>&- | awk '$1 == "*" { print $2 }' || true
+  \git branch 2>&- | awk '$1 == "*" { print $2 }' || true
 } 
 
 function git_status {
@@ -27,11 +29,11 @@ function git_status {
   if [[ $(grep -c "# Changes" $gitstat) > 0 ]]; then
     num=$(sed -n '/^# Changes/,/^# [^ ]/p' $gitstat | grep '^#	' | wc -l | awk '{print $1}')
     if [[ "$num" -gt 9 ]]; then
-      echo -n "!!{$num}!!"
+        echo -n "!!{$num}!!"
     else
       while [[ "$num" > 0 ]]; do 
-          echo -n "!"
-          num=$((num -1))
+      echo -n "!"
+      num=$((num -1))
       done
     fi
   fi
@@ -39,24 +41,24 @@ function git_status {
   if [[ $(grep -c "# Changed" $gitstat) > 0 ]]; then
     num=$(sed -n '/^# Changed/,/^# [^ ]/p' $gitstat | grep '^#	' | wc -l | awk '{print 1}')
     if [[ "$num" -gt 9 ]]; then
-      echo -n "??{$num}??"
+        echo -n "??{$num}??"
     else
-      while [[ "$num" > 0 ]]; do 
-          echo -n "?"
-          num=$((num -1))
-      done
+        while [[ "$num" > 0 ]]; do 
+        echo -n "?"
+        num=$((num -1))
+        done
     fi
   fi
 
   if [[ $(grep -c "# Untracked" $gitstat) > 0 ]]; then
     num=$(sed -n '/^# Untracked/,/^# [^ ]/p' $gitstat | grep '^#	' | wc -l | awk '{print $1}')
     if [[ "$num" -gt 9 ]]; then
-      echo -n "**{$num}**"
+        echo -n "**{$num}**"
     else
-      while [[ "$num" > 0 ]]; do 
-          echo -n "*"
-          num=$((num -1))
-      done
+        while [[ "$num" > 0 ]]; do 
+        echo -n "*"
+        num=$((num -1))
+        done
     fi
   fi
 
@@ -64,97 +66,85 @@ function git_status {
 }
 
 function def_prompt {
-    LAST_ERROR="$?"
+  LAST_ERROR="$?"
 
-    [[ -z $COLUMNS ]] && eval $(resize)
-    [[ -z $USER ]] && USER=$(whoami)
+  [[ -z $COLUMNS ]] && eval $(resize)
+  [[ -z $LOGNAME ]] && LOGNAME=$(whoami)
 
-    if [[ -f $HOME/.name ]]; then
-      hst_this=$(cat $HOME/.name)
+  if [[ -f $HOME/.name ]]; then
+    hst_this=$(cat $HOME/.name)
+  else
+    hst_this=$(hostname | awk -F.  'BEGIN { OFS="."; } {$(NF-1)=""; $NF=""; print $0; }' | sed 's#[.]*$##')
+    if [[ -z $hst_this ]]; then
+      hst_this=$(hostname -s)
+    fi
+  fi
+
+  if [[ -n $LX_ORIGIN && -z $LZ_FROM ]]; then
+    LZ_SSH_TRAIL="/$LX_ORIGIN"
+    export LX_ORIGIN="$hst_this/$LX_ORIGIN"
+    export LZ_FROM="$hst_this"
+  elif [[ $LZ_FROM != $hst_this ]]; then
+    LZ_SSH_TRAIL=""
+    export LX_ORIGIN="$hst_this"
+    export LZ_FROM=$hst_this
+  fi
+
+  if [[ -n $LX_ORIGIN && $LX_ORIGIN != $LZ_FROM ]]; then
+    txtHOSTNAME_="$LOGNAME@$LX_ORIGIN"
+    prnHOSTNAME="${sdhigh}$LOGNAME@$hst_this${sdcomment}$LZ_SSH_TRAIL$${sdcomment}--${sdtext}"
+  else
+    txtHOSTNAME_="$LOGNAME@$hst_this"
+    prnHOSTNAME="${sdtext}$LOGNAME@$hst_this${sdtext} $${sdcomment}--"
+  fi
+
+  PSFILL="$${sdcomment}--"
+  txtPSINFO=""
+  prnPSINFO="" 
+
+  if [[ -n $LAST_ERROR && $LAST_ERROR != 0 ]]; then
+    prnPSINFO="${sred}[$LAST_ERROR] $prnPSINFO"
+    txtPSINFO="[$LAST_ERROR] $txtPSINFO"
+  fi
+
+  xHOME=$HOME
+  [[ -L $HOME ]] && xHOME=$(readlink $HOME)
+  if [[ $(eval echo ~$LOGNAME) != $xHOME ]]; then
+    prnPSINFO="-- ${sdtext}${PWD}${sdtext} $prnPSINFO"
+    txtPSINFO="-- ${PWD} $txtPSINFO"
+  else
+    prnPSINFO="-- ${sdtext}${PWD/$HOME/~}${sdtext} $prnPSINFO"
+    txtPSINFO="-- ${PWD/$HOME/~} $txtPSINFO"
+  fi
+
+  nm_branch=$(git_branch)
+  nm_project=$(git_project)
+  if [[ -n $nm_branch ]]; then
+    gstatus=$(git_status)
+    if [[ ${gstatus% *} = ":" ]]; then
+      true # TODO
     else
-      hst_this=$(hostname | awk -F.  'BEGIN { OFS="."; } {$(NF-1)=""; $NF=""; print $0; }' | sed 's#[.]*$##')
-      if [[ -z $hst_this ]]; then
-        hst_this=$(hostname -s)
-      fi
+      true # TODO
     fi
+    prnPSINFO="${sdhigh}-- ${sdtext}$nm_branch${sorange}${gstatus% *}${sdtext}$nm_project${sorange}${gstatus#* }${sdhigh}${sdtext} $prnPSINFO"
+    txtPSINFO="-- $nm_branch${gstatus% *}$nm_project${gstatus#* } $txtPSINFO"
+fi
 
-    clrBASE="$sdhigh"
-    clrLINE="$sdtext"
-    clrDARKER="$sdcomment"
-    clrSPECIAL="$sdtext"
-    clrSPECIAL2="$sorange"
-
-    prnSTART="$sdtext"
-    prnEND="$sdtext"
-
-    if [[ -n $LX_ORIGIN && -z $LZ_FROM ]]; then
-      LZ_SSH_TRAIL="/$LX_ORIGIN"
-      export LX_ORIGIN="$hst_this/$LX_ORIGIN"
-      export LZ_FROM="$hst_this"
-    elif [[ $LZ_FROM != $hst_this ]]; then
-      LZ_SSH_TRAIL=""
-      export LX_ORIGIN="$hst_this"
-      export LZ_FROM=$hst_this
-    fi
-
-    if [[ -n $LX_ORIGIN && $LX_ORIGIN != $LZ_FROM ]]; then
-        HOSTNAME_="$USER@$LX_ORIGIN"
-        prnHOSTNAME="$clrSPECIAL$USER@$hst_this$clrDARKER$LZ_SSH_TRAIL$clrLINE--$prnSTART"
-    else
-        HOSTNAME_="$USER@$hst_this"
-        prnHOSTNAME="$clrBASE$USER@$hst_this$prnSTART $clrLINE--"
-    fi
-
-    PSFILL="$clrLINE--"
-    PSINFO=""
-    prnPSINFO="" 
-
-    if [[ -n $LAST_ERROR && $LAST_ERROR != 0 ]]; then
-        clrERROR="$sred"
-        prnPSINFO="$clrSPECIAL$clrERROR[$LAST_ERROR]$clrSPECIAL$prnSTART $prnPSINFO"
-        PSINFO="[$LAST_ERROR] $PSINFO"
-    fi
-
-    xHOME=$HOME
-    [[ -L $HOME ]] && xHOME=$(readlink $HOME)
-    if [[ $(eval echo ~$USER) != $xHOME ]]; then
-        prnPSINFO="-- $clrBASE${PWD}$prnSTART $prnPSINFO"
-        PSINFO="-- ${PWD} $PSINFO"
-    else
-        prnPSINFO="-- $clrBASE${PWD/$HOME/~}$prnSTART $prnPSINFO"
-        PSINFO="-- ${PWD/$HOME/~} $PSINFO"
-    fi
-
-    nm_branch=$(git_branch)
-    nm_project=$(git_project)
-    [[ -n $nm_branch ]] && {
-        gstatus=$(git_status)
-        if [[ ${gstatus% *} = ":" ]]; then
-            clrGITPUSH="$sorange"
-        else
-            clrGITPUSH="$sorange"
-        fi
-        prnPSINFO="$clrSPECIAL-- $clrBASE$nm_branch$clrGITPUSH${gstatus% *}$clrBASE$nm_project${sorange}${gstatus#* }$clrSPECIAL$prnSTART $prnPSINFO"
-        PSINFO="-- $nm_branch${gstatus% *}$nm_project${gstatus#* } $PSINFO"
-    }
-
-    local len_prompt=$(echo -n "$PSINFO $HOSTNAME_ --" | wc -c | tr -d " ")
-    local len_virtualenv=0 #$(echo -n "($(basename $VIRTUAL_ENV))" | wc -c)
-    local len_rfill=$((COLUMNS - len_prompt - 3 - len_virtualenv))
-    while [[ $len_rfill > 0 && ${len_rfill##-*}x != "x" ]]; do
-        PSFILL="${PSFILL}-"
-        len_rfill=$((len_rfill - 1))
-    done
-     
-    if [[ $len_rfill < 0 ]]; then
-        local len_cut=$((3 - len_rfill))
-        PSINFO="...$(echo -n $PSINFO | sed -e "s/\(^.\{$len_cut\}\)\(.*\)/\2/")"
-    fi
-
-    prnMODE="$PS_MODE"
+  local len_prompt=$(echo -n "$txtPSINFO $txtHOSTNAME_ --" | wc -c | tr -d " ")
+  local len_virtualenv=0 #$(echo -n "($(basename $VIRTUAL_ENV))" | wc -c)
+  local len_rfill=$((COLUMNS - len_prompt - 3 - len_virtualenv))
+  while [[ $len_rfill > 0 && ${len_rfill##-*}x != "x" ]]; do
+    PSFILL="${PSFILL}-"
+    len_rfill=$((len_rfill - 1))
+  done
+   
+  if [[ $len_rfill < 0 ]]; then
+    local len_cut=$((3 - len_rfill))
+    txtPSINFO="...$(echo -n $txtPSINFO | sed -e "s/\(^.\{$len_cut\}\)\(.*\)/\2/")"
+  fi
 }
 
-PS2="\$prnSTART > \$prnEND"
-PS1="\$prnSTART\$prnPSINFO\$PSFILL \$prnHOSTNAME\$prnEND\n-- \$SHLVL:\$HISTCMD \$prnMODE=> "
+PS2="\${sdtext} > \${sdtext}"
+PS1="\${sdtext}\$prnPSINFO\$PSFILL \$prnHOSTNAME\${sdtext}\n-- \$SHLVL:\$HISTCMD \$PS_MODE=> "
  
-# vim: ts=4 sw=4 et
+# vim: ts=2 sw=2 et
