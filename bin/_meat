@@ -9,7 +9,7 @@ __meat__='y'
 # if getting-started bootstrap is detected, put this in the path
 # mainly useful for getopt on os x
 if [[ -d "$HOME/.getting-started/bootstrap" ]]; then
-  PATH="$PATH:$HOME/.getting-started/bootstrap"
+  PATH="$HOME/.getting-started/bootstrap:$PATH"
 fi
 
 function check_help {
