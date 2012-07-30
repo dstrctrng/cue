@@ -84,7 +84,7 @@ function prompt_git {
     else
       clr_gstatus="${syellow}"
     fi
-    echo " ${sdhigh}$nm_branch${clr_gstatus}${gstatus% *}${sdhigh}$nm_project${scyan}${gstatus#* }"
+    echo " ${sdhigh}$nm_branch${clr_gstatus}${gstatus% *}${sdhigh}$nm_project${syellow}${gstatus#* }"
   fi
 }
 
