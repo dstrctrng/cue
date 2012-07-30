@@ -65,11 +65,32 @@ function git_status {
   rm -f $gitstat
 }
 
-function prompt {
+function prompt_error {
+  # optional error
   local err_last="$?"
+  if [[ -n $err_last && $err_last != 0 ]]; then
+    echo " ${sorange}[${sred}$err_last${sorange}]"
+  fi
+}
 
+function prompt_git {
+  # optional git
+  local nm_branch=$(git_branch)
+  local nm_project=$(git_project)
+  if [[ -n $nm_branch ]]; then
+    local gstatus=$(git_status)
+    if [[ ${gstatus% *} = ":" ]]; then
+      clr_gstatus="${sdcomment}"
+    else
+      clr_gstatus="${syellow}"
+    fi
+    echo " ${sdhigh}$nm_branch${clr_gstatus}${gstatus% *}${sdhigh}$nm_project${scyan}${gstatus#* }"
+  fi
+}
+
+function prompt_ssh {
+  # ssh trail
   local hst_this
-
   if [[ -f $HOME/.name ]]; then
     hst_this=$(cat $HOME/.name)
   else
@@ -80,71 +101,56 @@ function prompt {
     hst_this=$(hostname -s)
   fi
 
-  local txt_ssh_trail
+  local txt_origin
   if [[ -n $LX_ORIGIN && -z $LZ_FROM ]]; then
-    txt_ssh_trail="/$LX_ORIGIN"
-    LX_ORIGIN="$hst_this/$LX_ORIGIN"
-    LZ_FROM="$hst_this"
-  elif [[ $LZ_FROM != $hst_this ]]; then
-    txt_ssh_trail=""
-    LX_ORIGIN="$hst_this"
-    LZ_FROM=$hst_this
+    txt_origin="/$LX_ORIGIN"
+    export LX_ORIGIN="$hst_this${txt_origin}"
   fi
-  export LX_ORIGIN LZ_FROM
 
-  if [[ -n $LX_ORIGIN && $LX_ORIGIN != $LZ_FROM ]]; then
-    prn_ssh_trail="${sdhigh}$LOGNAME@$hst_this${sdcomment}txt_ssh_origin"
-    txt_ssh_trail="$LOGNAME@$LX_ORIGIN"
+  if [[ -n $LX_ORIGIN && $LX_ORIGIN != "$hst_this" ]]; then
+    echo " ${sdhigh}$LOGNAME@$hst_this${sdcomment}${txt_origin}"
   else
-    prn_ssh_trail="${sdhigh}$LOGNAME@$hst_this"
-    txt_ssh_trail="$LOGNAME@$hst_this"
+    echo " ${sdhigh}$LOGNAME@$hst_this"
   fi
+}
 
-  txt_prompt=""
-  prn_prompt="" 
+function prompt_pwd {
+  # pwd
+  echo " ${sdhigh}${PWD/$HOME/~}"
+}
 
-  prn_prompt="${sdcomment}-- ${sdhigh}${PWD/$HOME/~}$prn_prompt"
-  txt_prompt="-- ${PWD/$HOME/~} $txt_prompt"
+function prompt_shell {
+  echo " ${sdtext}$SHLVL:$HISTCMD"
+}
 
-  local nm_branch=$(git_branch)
-  local nm_project=$(git_project)
-  if [[ -n $nm_branch ]]; then
-    local gstatus=$(git_status)
-    if [[ ${gstatus% *} = ":" ]]; then
-      clr_gstatus="${sdcomment}"
-    else
-      clr_gstatus="${syellow}"
-    fi
-    prn_prompt="${sdcomment}-- ${sdhigh}$nm_branch${clr_gstatus}${gstatus% *}${sdhigh}$nm_project${scyan}${gstatus#* } $prn_prompt"
-    txt_prompt="-- $nm_branch${gstatus% *}$nm_project${gstatus#* } $txt_prompt"
-fi
-
+function prompt_filler {
+  local prn_prompt="$1"; shift
+  # filler
   if [[ -z $COLUMNS ]]; then
     eval $(resize)
   fi
 
-  local len_prompt=$(echo -n "$txt_prompt $txt_ssh_trail --" | wc -c | tr -d " ")
-  local len_rfill=$((COLUMNS - len_prompt))
-  txt_fill=""
-  while [[ $len_rfill > 0 && ${len_rfill##-*}x != "x" ]]; do
+  local len_prompt=$(echo -n "$prn_prompt" | perl -pe 's{\e\[\d+;\d+m}{}g' | wc -c | tr -d " ")
+  local txt_fill=" "
+  for _ in $(eval echo {1..$((COLUMNS - len_prompt - 1))}); do
     txt_fill="${txt_fill}-"
-    len_rfill=$((len_rfill - 1))
   done
-   
-  if [[ $len_rfill < 0 ]]; then
-    local len_cut=$((len_rfill))
-    txt_prompt="...$(echo -n $txt_prompt | sed -e "s/\(^.\{$len_cut\}\)\(.*\)/\2/")"
-  fi
+  echo "${sdcomment}${txt_fill}"
+}
 
-  if [[ -n $err_last && $err_last != 0 ]]; then
-    prn_error="${sorange}[${sred}$err_last${sorange}] "
-  else
-    prn_error=""
-  fi
+function prompt {
+  prn_pwd="$(prompt_pwd)"
+  prn_git="$(prompt_git)"
+  prn_ssh="$(prompt_ssh)"
+  prn_shell="$(prompt_shell)"
+  prn_error="$(prompt_error)"
+  prn_fill="$(prompt_filler "--$prn_git$prn_pwd$prn_ssh --")"
 }
 
 PROMPT_COMMAND=prompt
-PS1="\$prn_prompt \${sdcomment}\$txt_fill \$prn_ssh_trail \${sdcomment}--\n\${sdcomment}-- \${sdtext}\$SHLVL:\$HISTCMD \${prn_error}\${sdhigh}=> "
+PS1="\
+\${sdcomment}--\${prn_git}\${prn_pwd}\${prn_fill}\$prn_ssh\${sdcomment} --
+\${sdcomment}--\${prn_shell}\${prn_error}\${sdhigh} => "
 PS2="\${sdhigh} > "
  
 # vim: ts=2 sw=2 et
