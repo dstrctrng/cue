@@ -91,14 +91,14 @@ function def_prompt {
   fi
 
   if [[ -n $LX_ORIGIN && $LX_ORIGIN != $LZ_FROM ]]; then
+    prnHOSTNAME="${sdhigh}$LOGNAME@$hst_this${sdcomment}$LZ_SSH_TRAIL${sdcomment}--${sdtext}"
     txtHOSTNAME_="$LOGNAME@$LX_ORIGIN"
-    prnHOSTNAME="${sdhigh}$LOGNAME@$hst_this${sdcomment}$LZ_SSH_TRAIL$${sdcomment}--${sdtext}"
   else
+    prnHOSTNAME="${sdtext}$LOGNAME@$hst_this${sdtext} ${sdcomment}--"
     txtHOSTNAME_="$LOGNAME@$hst_this"
-    prnHOSTNAME="${sdtext}$LOGNAME@$hst_this${sdtext} $${sdcomment}--"
   fi
 
-  PSFILL="$${sdcomment}--"
+  PSFILL="${sdcomment}--"
   txtPSINFO=""
   prnPSINFO="" 
 
