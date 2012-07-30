@@ -113,7 +113,7 @@ function prompt {
     if [[ ${gstatus% *} = ":" ]]; then
       clr_gstatus="${sdcomment}"
     else
-      clr_gstatus="${sdyellow}"
+      clr_gstatus="${syellow}"
     fi
     prn_prompt="${sdcomment}-- ${sdhigh}$nm_branch${clr_gstatus}${gstatus% *}${sdhigh}$nm_project${scyan}${gstatus#* } $prn_prompt"
     txt_prompt="-- $nm_branch${gstatus% *}$nm_project${gstatus#* } $txt_prompt"
