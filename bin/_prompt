@@ -65,86 +65,86 @@ function git_status {
   rm -f $gitstat
 }
 
-function def_prompt {
-  LAST_ERROR="$?"
+function prompt {
+  local err_last="$?"
 
-  [[ -z $COLUMNS ]] && eval $(resize)
-  [[ -z $LOGNAME ]] && LOGNAME=$(whoami)
+  local hst_this
 
   if [[ -f $HOME/.name ]]; then
     hst_this=$(cat $HOME/.name)
   else
     hst_this=$(hostname | awk -F.  'BEGIN { OFS="."; } {$(NF-1)=""; $NF=""; print $0; }' | sed 's#[.]*$##')
-    if [[ -z $hst_this ]]; then
-      hst_this=$(hostname -s)
-    fi
   fi
 
-  if [[ -n $LX_ORIGIN && -z $LZ_FROM ]]; then
-    LZ_SSH_TRAIL="/$LX_ORIGIN"
-    export LX_ORIGIN="$hst_this/$LX_ORIGIN"
-    export LZ_FROM="$hst_this"
-  elif [[ $LZ_FROM != $hst_this ]]; then
-    LZ_SSH_TRAIL=""
-    export LX_ORIGIN="$hst_this"
-    export LZ_FROM=$hst_this
+  if [[ -z $hst_this ]]; then
+    hst_this=$(hostname -s)
   fi
+
+  local txt_ssh_trail
+  if [[ -n $LX_ORIGIN && -z $LZ_FROM ]]; then
+    txt_ssh_trail="/$LX_ORIGIN"
+    LX_ORIGIN="$hst_this/$LX_ORIGIN"
+    LZ_FROM="$hst_this"
+  elif [[ $LZ_FROM != $hst_this ]]; then
+    txt_ssh_trail=""
+    LX_ORIGIN="$hst_this"
+    LZ_FROM=$hst_this
+  fi
+  export LX_ORIGIN LZ_FROM
 
   if [[ -n $LX_ORIGIN && $LX_ORIGIN != $LZ_FROM ]]; then
-    prnHOSTNAME="${sdhigh}$LOGNAME@$hst_this${sdcomment}$LZ_SSH_TRAIL${sdcomment}--${sdtext}"
-    txtHOSTNAME_="$LOGNAME@$LX_ORIGIN"
+    prn_ssh_trail="${sdhigh}$LOGNAME@$hst_this${sdcomment}txt_ssh_origin"
+    txt_ssh_trail="$LOGNAME@$LX_ORIGIN"
   else
-    prnHOSTNAME="${sdtext}$LOGNAME@$hst_this${sdtext} ${sdcomment}--"
-    txtHOSTNAME_="$LOGNAME@$hst_this"
+    prn_ssh_trail="${sdhigh}$LOGNAME@$hst_this"
+    txt_ssh_trail="$LOGNAME@$hst_this"
   fi
 
-  PSFILL="${sdcomment}--"
-  txtPSINFO=""
-  prnPSINFO="" 
+  txt_prompt=""
+  prn_prompt="" 
 
-  if [[ -n $LAST_ERROR && $LAST_ERROR != 0 ]]; then
-    prnPSINFO="${sred}[$LAST_ERROR] $prnPSINFO"
-    txtPSINFO="[$LAST_ERROR] $txtPSINFO"
-  fi
+  prn_prompt="${sdcomment}-- ${sdhigh}${PWD/$HOME/~}$prn_prompt"
+  txt_prompt="-- ${PWD/$HOME/~} $txt_prompt"
 
-  xHOME=$HOME
-  [[ -L $HOME ]] && xHOME=$(readlink $HOME)
-  if [[ $(eval echo ~$LOGNAME) != $xHOME ]]; then
-    prnPSINFO="-- ${sdtext}${PWD}${sdtext} $prnPSINFO"
-    txtPSINFO="-- ${PWD} $txtPSINFO"
-  else
-    prnPSINFO="-- ${sdtext}${PWD/$HOME/~}${sdtext} $prnPSINFO"
-    txtPSINFO="-- ${PWD/$HOME/~} $txtPSINFO"
-  fi
-
-  nm_branch=$(git_branch)
-  nm_project=$(git_project)
+  local nm_branch=$(git_branch)
+  local nm_project=$(git_project)
   if [[ -n $nm_branch ]]; then
-    gstatus=$(git_status)
+    local gstatus=$(git_status)
     if [[ ${gstatus% *} = ":" ]]; then
-      true # TODO
+      clr_gstatus="${sdcomment}"
     else
-      true # TODO
+      clr_gstatus="${sdyellow}"
     fi
-    prnPSINFO="${sdhigh}-- ${sdtext}$nm_branch${sorange}${gstatus% *}${sdtext}$nm_project${sorange}${gstatus#* }${sdhigh}${sdtext} $prnPSINFO"
-    txtPSINFO="-- $nm_branch${gstatus% *}$nm_project${gstatus#* } $txtPSINFO"
+    prn_prompt="${sdcomment}-- ${sdhigh}$nm_branch${clr_gstatus}${gstatus% *}${sdhigh}$nm_project${scyan}${gstatus#* } $prn_prompt"
+    txt_prompt="-- $nm_branch${gstatus% *}$nm_project${gstatus#* } $txt_prompt"
 fi
 
-  local len_prompt=$(echo -n "$txtPSINFO $txtHOSTNAME_ --" | wc -c | tr -d " ")
-  local len_virtualenv=0 #$(echo -n "($(basename $VIRTUAL_ENV))" | wc -c)
-  local len_rfill=$((COLUMNS - len_prompt - 3 - len_virtualenv))
+  if [[ -z $COLUMNS ]]; then
+    eval $(resize)
+  fi
+
+  local len_prompt=$(echo -n "$txt_prompt $txt_ssh_trail --" | wc -c | tr -d " ")
+  local len_rfill=$((COLUMNS - len_prompt))
+  txt_fill=""
   while [[ $len_rfill > 0 && ${len_rfill##-*}x != "x" ]]; do
-    PSFILL="${PSFILL}-"
+    txt_fill="${txt_fill}-"
     len_rfill=$((len_rfill - 1))
   done
    
   if [[ $len_rfill < 0 ]]; then
-    local len_cut=$((3 - len_rfill))
-    txtPSINFO="...$(echo -n $txtPSINFO | sed -e "s/\(^.\{$len_cut\}\)\(.*\)/\2/")"
+    local len_cut=$((len_rfill))
+    txt_prompt="...$(echo -n $txt_prompt | sed -e "s/\(^.\{$len_cut\}\)\(.*\)/\2/")"
+  fi
+
+  if [[ -n $err_last && $err_last != 0 ]]; then
+    prn_error="${sorange}[${sred}$err_last${sorange}] "
+  else
+    prn_error=""
   fi
 }
 
-PS2="\${sdtext} > \${sdtext}"
-PS1="\${sdtext}\$prnPSINFO\$PSFILL \$prnHOSTNAME\${sdtext}\n-- \$SHLVL:\$HISTCMD \$PS_MODE=> "
+PROMPT_COMMAND=prompt
+PS1="\$prn_prompt \${sdcomment}\$txt_fill \$prn_ssh_trail \${sdcomment}--\n\${sdcomment}-- \${sdtext}\$SHLVL:\$HISTCMD \${prn_error}\${sdhigh}=> "
+PS2="\${sdhigh} > "
  
 # vim: ts=2 sw=2 et
