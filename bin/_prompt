@@ -120,7 +120,7 @@ function prompt_pwd {
 }
 
 function prompt_shell {
-  echo " ${sdtext}$SHLVL:$HISTCMD"
+  echo " $SHLVL:$HISTCMD"
 }
 
 function prompt_filler {
@@ -149,8 +149,8 @@ function prompt {
 
 PROMPT_COMMAND=prompt
 PS1="\
-\${sdcomment}--\${prn_git}\${prn_pwd}\${prn_fill}\$prn_ssh\${sdcomment} --
-\${sdcomment}--\${prn_shell}\${prn_error}\${sdhigh} => "
+\${sdcomment}--\${prn_git}\${prn_pwd}\${prn_fill}\$prn_ssh\${sdcomment} --\${sdhigh}
+--\${prn_shell}\${prn_error} => "
 PS2="\${sdhigh} > "
  
 # vim: ts=2 sw=2 et
