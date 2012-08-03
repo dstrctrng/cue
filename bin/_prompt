@@ -139,11 +139,12 @@ function prompt_filler {
 }
 
 function prompt {
-  prn_pwd="$(prompt_pwd)"
-  prn_git="$(prompt_git)"
-  prn_ssh="$(prompt_ssh)"
-  prn_shell="$(prompt_shell)"
-  prn_error="$(prompt_error)"
+  prn_pwd="$(prompt_pwd)" &
+  prn_git="$(prompt_git)" &
+  prn_ssh="$(prompt_ssh)" &
+  prn_shell="$(prompt_shell)" &
+  prn_error="$(prompt_error)" &
+  wait
   prn_fill="$(prompt_filler "--$prn_git$prn_pwd$prn_ssh --")"
 }
 
