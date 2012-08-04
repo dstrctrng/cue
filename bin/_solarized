@@ -116,6 +116,7 @@ xviolet='#6c71c4'
 xyellow='#b58900'
 
 : ${sscheme:=dark}
+cmd_xc="$(which xtermcontrol 2>&-)"
 
 function sdark {
   sbg="$sdbg"
@@ -123,6 +124,9 @@ function sdark {
   stext="$sdtext"
   scomment="$sdcomment"
   shigh="$sdhigh"
+  if [[ -n "$DISPLAY" && -x "$cmd_xc" ]]; then
+    "$cmd_xc" --bg "$xbase03"
+  fi
   sscheme="dark"
 }
 
@@ -132,6 +136,9 @@ function slight {
   stext="$sltext"
   scomment="$slcomment"
   shigh="$slhigh"
+  if [[ -n "$DISPLAY" && -x "$cmd_xc" ]]; then
+    "$cmd_xc" --bg "$xbase3"
+  fi
   sscheme="light"
 }
 
