@@ -1,0 +1,32 @@
+## Getting started
+
+Clone this project to `$HOME/.cue`
+
+Configure the left and right parts of the prompt in `.bash_profile`.
+The git, pwd, and ssh prompts are provided in cue.  
+
+    export PS1_LEFT='${prn_git}${prn_pwd}'
+    export PS1_RIGHT='${prn_ssh}'
+
+Load the cue profile in both `.bash_profile` and `.bashrc` so sub-shells
+also get the prompt.
+
+    CUE=$HOME/.cue source $HOME/.cue/bin/_profile
+
+## Adding a custom prompt
+
+For an example, we'll add a hello prompt to the right side.
+
+Insert the hello prompt placeholder into PS1_RIGHT:
+
+    export PS1_RIGHT='${prn_ssh}${prn_hello}'
+    
+`cue` will look for a function or command named prompt-hello.  In
+`.bashrc`, define a function of that name:
+
+    function prompt-hello {
+      echo " ${syellow}hello!"
+    }
+
+Source `.bash_profile` to reload the prompt definitions.  There should
+be a yellow "hello!" to the right of the prompt.
