@@ -124,7 +124,7 @@ function sdark {
   stext="$sdtext"
   scomment="$sdcomment"
   shigh="$sdhigh"
-  if [[ -n "$DISPLAY" && -x "$cmd_xc" ]]; then
+  if [[ -n "$DISPLAY" && "${TERM%%-*}" = "xterm" && -x "$cmd_xc" ]]; then
     "$cmd_xc" --bg "$xbase03"
   fi
   sscheme="dark"
@@ -136,7 +136,7 @@ function slight {
   stext="$sltext"
   scomment="$slcomment"
   shigh="$slhigh"
-  if [[ -n "$DISPLAY" && -x "$cmd_xc" ]]; then
+  if [[ -n "$DISPLAY" && "${TERM%%-*}" = "xterm" && -x "$cmd_xc" ]]; then
     "$cmd_xc" --bg "$xbase3"
   fi
   sscheme="light"
