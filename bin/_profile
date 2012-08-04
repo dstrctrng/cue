@@ -1,6 +1,8 @@
 #!/bin/bash
 
-source "$HOME/.cue/bin/_nim"
-source "$HOME/.cue/bin/_bindings"
-source "$HOME/.cue/bin/_solarized"
-source "$HOME/.cue/bin/_prompt"
+: ${CUE:="$(cd -P -- "$(dirname -- "$0")/.." && pwd -P)"}
+
+source "$CUE/bin/_nim"
+source "$CUE/bin/_bindings"
+source "$CUE/bin/_solarized"
+source "$CUE/bin/_prompt"
