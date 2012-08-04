@@ -12,6 +12,6 @@ source "$CUE/bin/_prompt"
 : ${PS1_RIGHT:='${prn_ssh}'}
 : ${PS1_END:=' --'}
 
-PS1="\${sdcomment}${PS1_START}${PS1_LEFT}\${prn_filler}${PS1_RIGHT}\${sdcomment}${PS1_END}\${sdhigh}
+PS1="\${scomment}${PS1_START}${PS1_LEFT}\${prn_filler}${PS1_RIGHT}\${scomment}${PS1_END}\${shigh}
 --\${prn_shell}\${prn_error} => "
-PS2="\${sdhigh} > "
+PS2="\${shigh} > "
