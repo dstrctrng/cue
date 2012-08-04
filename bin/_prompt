@@ -86,11 +86,11 @@ function prompt-git {
   if [[ -n $nm_branch ]]; then
     local gstatus=$(git_status)
     if [[ ${gstatus% *} = ":" ]]; then
-      clr_gstatus="${sdcomment}"
+      clr_gstatus="${scomment}"
     else
       clr_gstatus="${syellow}"
     fi
-    echo " ${sdhigh}$nm_branch${clr_gstatus}${gstatus% *}${sdhigh}$nm_project${syellow}${gstatus#* }"
+    echo " ${shigh}$nm_branch${clr_gstatus}${gstatus% *}${shigh}$nm_project${syellow}${gstatus#* }"
   fi
 }
 
@@ -114,15 +114,15 @@ function prompt-ssh {
   fi
 
   if [[ -n $LX_ORIGIN && $LX_ORIGIN != "$hst_this" ]]; then
-    echo " ${sdhigh}$LOGNAME@$hst_this${sdcomment}${txt_origin}"
+    echo " ${shigh}$LOGNAME@$hst_this${scomment}${txt_origin}"
   else
-    echo " ${sdhigh}$LOGNAME@$hst_this"
+    echo " ${shigh}$LOGNAME@$hst_this"
   fi
 }
 
 function prompt-pwd {
   # pwd
-  echo " ${sdhigh}${PWD/$HOME/~}"
+  echo " ${shigh}${PWD/$HOME/~}"
 }
 
 function prompt-shell {
@@ -141,7 +141,7 @@ function prompt-filler {
   for _ in $(eval echo {1..$((COLUMNS - len_prompt - 1))}); do
     txt_fill="${txt_fill}-"
   done
-  echo "${sdcomment}${txt_fill}"
+  echo "${scomment}${txt_fill}"
 }
 
 function prompt {

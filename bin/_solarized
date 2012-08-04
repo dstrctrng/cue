@@ -66,14 +66,14 @@ _sbase1="1;36"
 _sbase2="1;37"
 _sbase3="1;37"
 
-_syellow="0;33"
-_sorange="1;31"
-_sred="0;31"
-_smagenta="0;35"
-_sviolet="1;35"
 _sblue="0;34"
 _scyan="0;36"
 _sgreen="0;32"
+_smagenta="0;35"
+_sorange="1;31"
+_sred="0;31"
+_sviolet="1;35"
+_syellow="0;33"
 
 sdbg="$(_ansi "$_sbase03")"
 sdm="$(_ansi "$_sbase02")"
@@ -87,12 +87,56 @@ sltext="$(_ansi "$_sbase00")"
 slcomment="$(_ansi "$_sbase1")"
 slhigh="$(_ansi "$_sbase01")"
 
-syellow="$(_ansi "$_syellow")"
-sorange="$(_ansi "$_sorange")"
-sred="$(_ansi "$_sred")"
-smagenta="$(_ansi "$_smagenta")"
-sviolet="$(_ansi "$_sviolet")"
 sblue="$(_ansi "$_sblue")"
 scyan="$(_ansi "$_scyan")"
 sgreen="$(_ansi "$_sgreen")"
+smagenta="$(_ansi "$_smagenta")"
+sorange="$(_ansi "$_sorange")"
+sred="$(_ansi "$_sred")"
+sviolet="$(_ansi "$_sviolet")"
+syellow="$(_ansi "$_syellow")"
 
+xbase00='#657b83'
+xbase01='#586e75'
+xbase02='#073642'
+xbase03='#002b36'
+
+xbase0='#839496'
+xbase1='#93a1a1'
+xbase2='#eee8d5'
+xbase3='#fdf6e3'
+
+xblue='#268bd2'
+xcyan='#2aa198'
+xgreen='#859900'
+xmagenta='#d33682'
+xorange='#cb4b16'
+xred='#dc322f'
+xviolet='#6c71c4'
+xyellow='#b58900'
+
+: ${sscheme:=dark}
+
+function sdark {
+  sbg="$sdbg"
+  sm="$sdm"
+  stext="$sdtext"
+  scomment="$sdcomment"
+  shigh="$sdhigh"
+  sscheme="dark"
+}
+
+function slight {
+  sbg="$slbg"
+  sm="$slm"
+  stext="$sltext"
+  scomment="$slcomment"
+  shigh="$slhigh"
+  sscheme="light"
+}
+
+if [[ "$sscheme" = "dark" ]]; then
+  sdark
+else
+  slight
+fi
