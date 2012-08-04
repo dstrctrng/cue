@@ -6,3 +6,12 @@ source "$CUE/bin/_nim"
 source "$CUE/bin/_bindings"
 source "$CUE/bin/_solarized"
 source "$CUE/bin/_prompt"
+
+: ${PS1_START:='--'}
+: ${PS1_LEFT:='${prn_pwd}'}
+: ${PS1_RIGHT:='${prn_ssh}'}
+: ${PS1_END:=' --'}
+
+PS1="\${sdcomment}${PS1_START}${PS1_LEFT}\${prn_filler}${PS1_RIGHT}\${sdcomment}${PS1_END}\${sdhigh}
+--\${prn_shell}\${prn_error} => "
+PS2="\${sdhigh} > "
