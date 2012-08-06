@@ -56,6 +56,14 @@ function which_library {
     echo "$shome/.$library/bin/_profile"
   elif [[ -r "$shome/.$library/.profile" ]]; then
     echo "$shome/.$library/.profile"
+  else
+    local nm_library="${library%%/*}"
+    if [[ "$nm_library" != "$library" ]]; then
+      local nm_right="${library##*/}"
+      if [[ -r "$shome/.$nm_library/bin/_$nm_right" ]]; then
+        echo "$shome/.$nm_library/bin/_$nm_right"
+      fi
+    fi
   fi
 }
 
