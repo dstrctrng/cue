@@ -11,7 +11,7 @@ function git_project {
 function git_branch {
   local nm_branch="$(\git branch 2>&- | awk '$1 == "*" { $1=""; print }' || true)"
   nm_branch="${nm_branch# }"
-  if [[ "$nm_branch" = "no branch)" ]]; then
+  if [[ "$nm_branch" = "(no branch)" ]]; then
     nm_branch="<$(\git show-ref --head | awk '$2 == "HEAD" { print $1}' | cut -b1-7)>"
   fi
   echo "$nm_branch"
