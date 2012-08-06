@@ -73,18 +73,16 @@ function git_status {
 
 function prompt-git {
   # optional git
-  local tmp_branch="$(mktemp -t XXXXXXXXX)"
   local tmp_project="$(mktemp -t XXXXXXXXX)"
   local tmp_status="$(mktemp -t XXXXXXXXX)"
-  git_branch > $tmp_branch &
   git_project > $tmp_project &
   git_status > $tmp_status &
   wait
 
-  local nm_branch="$(cat $tmp_branch)"
   local nm_project="$(cat $tmp_project)"
   local gstatus="$(cat $tmp_status)"
-  rm -f $tmp_branch $tmp_project $tmp_status
+  local nm_branch="$(git_branch)"
+  rm -f $tmp_project $tmp_status
 
   if [[ -n $nm_project ]]; then
     local clr_gstatus="${scomment}"
