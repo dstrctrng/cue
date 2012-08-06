@@ -69,18 +69,27 @@ function prompt-git {
   # optional git
   local tmp_branch="$(mktemp -t XXXXXXXXX)"
   local tmp_project="$(mktemp -t XXXXXXXXX)"
+  local tmp_status="$(mktemp -t XXXXXXXXX)"
   git_branch > $tmp_branch &
   git_project > $tmp_project &
+  git_status > $tmp_status &
   wait
+
   local nm_branch="$(cat $tmp_branch)"
   local nm_project="$(cat $tmp_project)"
-  rm -f $tmp_branch $tmp_project
-  if [[ -n $nm_branch ]]; then
-    local gstatus=$(git_status)
-    if [[ ${gstatus% *} = ":" ]]; then
-      clr_gstatus="${scomment}"
+  local gstatus="$(cat $tmp_status)"
+  rm -f $tmp_branch $tmp_project $tmp_status
+
+  if [[ -n $nm_project ]]; then
+    local clr_gstatus="${scomment}"
+    if [[ -n $nm_branch ]]; then
+      if [[ ${gstatus% *} = !":" ]]; then
+        clr_gstatus="${syellow}"
+      fi
     else
+      gstatus=': '
       clr_gstatus="${syellow}"
+      nm_branch='<unknown>'
     fi
     echo " ${shigh}$nm_branch${clr_gstatus}${gstatus% *}${shigh}$nm_project${syellow}${gstatus#* }"
   fi
