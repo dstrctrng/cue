@@ -1,0 +1,87 @@
+#!/bin/bash
+
+function git_project {
+  gitname=$(\git config remote.origin.name)
+  if [[ -z $gitname ]]; then
+    gitname=$(basename $(\git config remote.origin.url) .git)
+  fi
+  echo "$gitname"
+}
+
+function git_branch {
+  \git branch 2>&- | awk '$1 == "*" { print $2 }' || true
+} 
+
+function git_status {
+  gitstat=$(mktemp -t XXXXXX)
+  \git status --ignore-submodules=dirty 2>/dev/null > $gitstat
+ 
+  if [[ $(grep -c "# Your branch is ahead" $gitstat) > 0 ]]; then
+    echo -n "^"
+  elif [[ $(grep -c "# Your branch is behind" $gitstat) > 0 ]]; then
+    echo -n "v"
+  else
+    echo -n ":"
+  fi
+
+  echo -n " "
+
+  if [[ $(grep -c "# Changes" $gitstat) > 0 ]]; then
+    num=$(sed -n '/^# Changes/,/^# [^ ]/p' $gitstat | grep '^#	' | wc -l | awk '{print $1}')
+    if [[ "$num" -gt 9 ]]; then
+        echo -n "!!{$num}!!"
+    else
+      while [[ "$num" > 0 ]]; do 
+      echo -n "!"
+      num=$((num -1))
+      done
+    fi
+  fi
+
+  if [[ $(grep -c "# Changed" $gitstat) > 0 ]]; then
+    num=$(sed -n '/^# Changed/,/^# [^ ]/p' $gitstat | grep '^#	' | wc -l | awk '{print 1}')
+    if [[ "$num" -gt 9 ]]; then
+        echo -n "??{$num}??"
+    else
+        while [[ "$num" > 0 ]]; do 
+        echo -n "?"
+        num=$((num -1))
+        done
+    fi
+  fi
+
+  if [[ $(grep -c "# Untracked" $gitstat) > 0 ]]; then
+    num=$(sed -n '/^# Untracked/,/^# [^ ]/p' $gitstat | grep '^#	' | wc -l | awk '{print $1}')
+    if [[ "$num" -gt 9 ]]; then
+        echo -n "**{$num}**"
+    else
+        while [[ "$num" > 0 ]]; do 
+        echo -n "*"
+        num=$((num -1))
+        done
+    fi
+  fi
+
+  rm -f $gitstat
+}
+
+function prompt-git {
+  # optional git
+  local tmp_branch="$(mktemp -t XXXXXXXXX)"
+  local tmp_project="$(mktemp -t XXXXXXXXX)"
+  git_branch > $tmp_branch &
+  git_project > $tmp_project &
+  wait
+  local nm_branch="$(cat $tmp_branch)"
+  local nm_project="$(cat $tmp_project)"
+  rm -f $tmp_branch $tmp_project
+  if [[ -n $nm_branch ]]; then
+    local gstatus=$(git_status)
+    if [[ ${gstatus% *} = ":" ]]; then
+      clr_gstatus="${scomment}"
+    else
+      clr_gstatus="${syellow}"
+    fi
+    echo " ${shigh}$nm_branch${clr_gstatus}${gstatus% *}${shigh}$nm_project${syellow}${gstatus#* }"
+  fi
+}

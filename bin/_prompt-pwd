@@ -1,0 +1,6 @@
+#!/bin/bash
+
+function prompt-pwd {
+  # pwd
+  echo " ${shigh}${PWD/$HOME/~}"
+}

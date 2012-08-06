@@ -4,7 +4,13 @@
 
 source "$CUE/bin/_nim"
 source "$CUE/bin/_bindings"
+
 source "$CUE/bin/_solarized"
+
+source "$CUE/bin/_prompt-pwd"
+source "$CUE/bin/_prompt-ssh"
+source "$CUE/bin/_prompt-git"
+
 source "$CUE/bin/_prompt"
 
 : ${PS1_START:='--'}
