@@ -13,6 +13,12 @@ also get the prompt.
 
     CUE=$HOME/.cue source $HOME/.cue/bin/_profile
 
+To load the ssh, pwd, and git prompts:
+
+  source $HOME/.cue/bin/_ssh
+  source $HOME/.cue/bin/_pwd
+  source $HOME/.cue/bin/_git
+
 ## Adding a custom prompt
 
 For an example, we'll add a hello prompt to the right side.
