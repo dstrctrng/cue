@@ -75,8 +75,8 @@ function prompt-git {
   # optional git
   local tmp_project="$(mktemp -t XXXXXXXXX)"
   local tmp_status="$(mktemp -t XXXXXXXXX)"
-  git_project > $tmp_project &
   git_status > $tmp_status &
+  git_project > $tmp_project &
   wait
 
   local nm_project="$(cat $tmp_project)"
