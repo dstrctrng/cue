@@ -38,7 +38,7 @@ function prompt {
 
   prn_shell="$(prompt-shell)"
   prn_error="$(prompt-error)"
-  prn_filler="$(prompt-filler "$(eval echo "--${PS1_LEFT}${PS1_RIGHT} --")")"
+  prn_filler="$(prompt-filler "$(eval echo "${PS1_START}${PS1_LEFT}${PS1_RIGHT}${PS1_END}")")"
 }
 
 PROMPT_COMMAND=prompt
