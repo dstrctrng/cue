@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function git_project {
-  gitname=$(\git config remote.origin.name)
+  local gitname=$(\git config remote.origin.name)
   if [[ -z $gitname ]]; then
     gitname=$(basename $(\git config remote.origin.url) .git)
   fi
@@ -10,15 +10,15 @@ function git_project {
 
 function git_branch {
   local nm_branch="$(\git branch 2>&- | awk '$1 == "*" { $1=""; print }' || true)"
-  if [[ "$nm_branch" = " (no branch)" ]]; then
-    nm_branch="<$(git show-ref --head | awk '$2 == "HEAD" { print $1}' | cut -b1-7)>"
+  nm_branch="${nm_branch# }"
+  if [[ "$nm_branch" = " no branch)" ]]; then
+    nm_branch="<$(\git show-ref --head | awk '$2 == "HEAD" { print $1}' | cut -b1-7)>"
   fi
-
   echo "$nm_branch"
 } 
 
 function git_status {
-  gitstat=$(mktemp -t XXXXXX)
+  local gitstat=$(mktemp -t XXXXXX)
   \git status --ignore-submodules=dirty 2>/dev/null > $gitstat
  
   if [[ $(grep -c "# Your branch is ahead" $gitstat) > 0 ]]; then
@@ -31,6 +31,7 @@ function git_status {
 
   echo -n " "
 
+  local num
   if [[ $(grep -c "# Changes" $gitstat) > 0 ]]; then
     num=$(sed -n '/^# Changes/,/^# [^ ]/p' $gitstat | grep '^#	' | wc -l | awk '{print $1}')
     if [[ "$num" -gt 9 ]]; then
