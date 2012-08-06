@@ -9,7 +9,12 @@ function git_project {
 }
 
 function git_branch {
-  \git branch 2>&- | awk '$1 == "*" { print $2 }' || true
+  local nm_branch="$(\git branch 2>&- | awk '$1 == "*" { $1=""; print }' || true)"
+  if [[ "$nm_branch" = " (no branch)" ]]; then
+    nm_branch="<$(git show-ref --head | awk '$2 == "HEAD" { print $1}' | cut -b1-7)>"
+  fi
+
+  echo "$nm_branch"
 } 
 
 function git_status {
