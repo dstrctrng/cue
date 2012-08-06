@@ -71,7 +71,7 @@ function git_status {
   rm -f $gitstat
 }
 
-function prompt-git {
+function prompt_git {
   # optional git
   local tmp_project="$(mktemp -t XXXXXXXXX)"
   local tmp_status="$(mktemp -t XXXXXXXXX)"

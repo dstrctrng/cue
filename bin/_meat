@@ -9,7 +9,11 @@ __meat__='y'
 # if getting-started bootstrap is detected, put this in the path
 # mainly useful for getopt on os x
 if [[ -d "$HOME/.getting-started/bootstrap" ]]; then
+<<<<<<< HEAD
   PATH="$PATH:$HOME/.getting-started/bootstrap"
+=======
+  PATH="$HOME/.getting-started/bootstrap:$PATH"
+>>>>>>> sh/master
 fi
 
 function check_help {
@@ -44,17 +48,37 @@ function display_man {
   awk '/^__MAN__/,/^MAN$/ {print}' <"$shome/bin/$(basename -- "$0")" | tail -n +2 | egrep -v '^MAN$'
 }
 
+<<<<<<< HEAD
+=======
+function display_synopsis {
+  awk '/^#/ && !/^#!/ { print } /^[^#]/ || /^$/ { exit }' <"$shome/bin/$(basename -- "$0")" | cut -c3-
+}
+
+>>>>>>> sh/master
 function which_library {
   local library="$1"; shift
   if [[ -r "$shome/bin/_$library" ]]; then
     echo "$shome/bin/_$library"
+  elif [[ -r "$shome/.$library/bin/_profile" ]]; then
+    echo "$shome/.$library/bin/_profile"
   elif [[ -r "$shome/.$library/.profile" ]]; then
     echo "$shome/.$library/.profile"
+  else
+    local nm_library="${library%%/*}"
+    if [[ "$nm_library" != "$library" ]]; then
+      local nm_right="${library##*/}"
+      if [[ -r "$shome/.$nm_library/bin/_$nm_right" ]]; then
+        echo "$shome/.$nm_library/bin/_$nm_right"
+      fi
+    fi
   fi
 }
 
 function require {
-  source "$(which_library "$@")"
+  local pth_lib="$(which_library "$@")"
+  if [[ -r "$pth_lib" ]]; then
+    source "$pth_lib"
+  fi
 }
 
 function parse_command_line {

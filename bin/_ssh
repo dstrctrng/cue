@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function prompt-ssh {
+function prompt_ssh {
   # ssh trail
   local hst_this
   if [[ -f $HOME/.name ]]; then

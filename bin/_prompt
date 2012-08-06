@@ -1,10 +1,10 @@
 #!/bin/bash
 
-function prompt-shell {
+function prompt_shell {
   echo " $SHLVL:$HISTCMD"
 }
 
-function prompt-error {
+function prompt_error {
   # optional error
   local err_last="$?"
   if [[ -n $err_last && $err_last != 0 ]]; then
@@ -12,7 +12,7 @@ function prompt-error {
   fi
 }
 
-function prompt-filler {
+function prompt_filler {
   local prn_prompt="$1"; shift
   # filler
   if [[ -z $COLUMNS ]]; then
@@ -31,14 +31,14 @@ function prompt {
   local prompts="$(echo "${PS1_LEFT}${PS1_RIGHT}" | sed 's#${prn_##g; s#}# #g')"
   local p
   for p in $prompts; do
-    fn_prn="prompt-${p}"
+    fn_prn="prompt_${p}"
     nm_prn="prn_${p}"
     eval "$nm_prn=\$($fn_prn)"
   done
 
-  prn_shell="$(prompt-shell)"
-  prn_error="$(prompt-error)"
-  prn_filler="$(prompt-filler "$(eval echo "${PS1_START}${PS1_LEFT}${PS1_RIGHT}${PS1_END}")")"
+  prn_shell="$(prompt_shell)"
+  prn_error="$(prompt_error)"
+  prn_filler="$(prompt_filler "$(eval echo "${PS1_START}${PS1_LEFT}${PS1_RIGHT}${PS1_END}")")"
 }
 
 PROMPT_COMMAND=prompt

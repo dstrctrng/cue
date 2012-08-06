@@ -27,10 +27,10 @@ Insert the hello prompt placeholder into PS1_RIGHT:
 
     export PS1_RIGHT='${prn_ssh}${prn_hello}'
     
-`cue` will look for a function or command named prompt-hello.  In
+`cue` will look for a function or command named prompt_hello.  In
 `.bashrc`, define a function of that name:
 
-    function prompt-hello {
+    function prompt_hello {
       echo " ${syellow}hello!"
     }
 
