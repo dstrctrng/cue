@@ -87,7 +87,7 @@ function prompt_git {
   if [[ -n $nm_project ]]; then
     local clr_gstatus="${scomment}"
     if [[ -n $nm_branch ]]; then
-      if [[ ${gstatus% *} = !":" ]]; then
+      if [[ ${gstatus% *} != ":" ]]; then
         clr_gstatus="${syellow}"
       fi
     else
