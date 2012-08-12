@@ -68,9 +68,10 @@ function which_library {
 }
 
 function require {
-  local pth_lib="$(which_library "$@")"
+  local nm_library="$1"; shift
+  local pth_lib="$(which_library "$nm_library")"
   if [[ -r "$pth_lib" ]]; then
-    source "$pth_lib"
+    source "$pth_lib" "$@"
   fi
 }
 
