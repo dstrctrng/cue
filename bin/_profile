@@ -1,6 +1,6 @@
 #!/bin/bash
 
-: ${CUE:="$(cd -P -- "$(dirname -- "$0")/.." && pwd -P)"}
+: ${CUE:="$(cd -P -- "$(dirname -- "${BASH_SOURCE}")/.." && pwd -P)"}
 
 source "$CUE/bin/_nim"
 source "$CUE/bin/_bindings"

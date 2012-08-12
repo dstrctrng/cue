@@ -11,13 +11,13 @@ The git, pwd, and ssh prompts are provided in cue.
 Load the cue profile in both `.bash_profile` and `.bashrc` so sub-shells
 also get the prompt.
 
-    CUE=$HOME/.cue source $HOME/.cue/bin/_profile
+    source $HOME/.cue/bin/_profile
 
 To load the ssh, pwd, and git prompts:
 
-  source $HOME/.cue/bin/_ssh
-  source $HOME/.cue/bin/_pwd
-  source $HOME/.cue/bin/_git
+    source $HOME/.cue/bin/_ssh
+    source $HOME/.cue/bin/_pwd
+    source $HOME/.cue/bin/_git
 
 ## Adding a custom prompt
 
