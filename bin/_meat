@@ -109,13 +109,8 @@ function ryaml {
 }
 
 function _main {
-  if [[ "$0" = "-bash" && -z "$shome" ]]; then
-    echo 'ERROR: cannot source library without setting $shome'
-    exit 1
-  fi
-
   if [[ -z "$shome" ]]; then
-    shome="$(cd -P -- "$(dirname -- "$0")/.." && pwd -P)"
+    shome="$(cd -P -- "$(dirname -- "${BASH_SOURCE}")/.." && pwd -P)"
   fi
 
   require 'shflags'
