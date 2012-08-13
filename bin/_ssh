@@ -14,12 +14,12 @@ function prompt_ssh {
   fi
 
   local txt_origin
-  if [[ -n $LX_ORIGIN && -z $LZ_FROM ]]; then
+  if [[ -n ${LX_ORIGIN:-} && -z $LZ_FROM ]]; then
     txt_origin="/$LX_ORIGIN"
     export LX_ORIGIN="$hst_this${txt_origin}"
   fi
 
-  if [[ -n $LX_ORIGIN && $LX_ORIGIN != "$hst_this" ]]; then
+  if [[ -n ${LX_ORIGIN:-} && $LX_ORIGIN != "$hst_this" ]]; then
     echo " ${shigh}$LOGNAME@$hst_this${scomment}${txt_origin}"
   else
     echo " ${shigh}$LOGNAME@$hst_this"
