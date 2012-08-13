@@ -1,8 +1,4 @@
 #!/bin/bash
 
-if [[ -z "$shome" ]]; then
-  shome="$(cd -P -- "$(dirname -- "${BASH_SOURCE}")/.." && pwd -P)"
-fi
-  
 source "$shome/bin/_jason" "$@"
 set -fue

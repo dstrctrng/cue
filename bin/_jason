@@ -6,12 +6,7 @@ if [[ "$__jason__" != 'x' ]]; then
 fi
 __jason__='y'
 
-if [[ "$#" = 2 && "$1" = "shome" ]]; then
-  shift
-  shome="$2"; shift
-else
-  shome="$(cd -P -- "$(dirname -- "${BASH_SOURCE}")/.." && pwd -P)"
-fi
+shome="$(cd -P -- "$(dirname -- "${BASH_SOURCE}")/.." && pwd -P)"
 
 # if getting-started bootstrap is detected, put this in the path
 # mainly useful for getopt on os x
