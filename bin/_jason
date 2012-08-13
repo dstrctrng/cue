@@ -1,10 +1,10 @@
 #!/bin/bash
 
-: ${__jason__:=x}
-if [[ "$__jason__" != 'x' ]]; then
+: ${__meat__:=x}
+if [[ "$__meat__" != 'x' ]]; then
   return 0
 fi
-__jason__='y'
+__meat__='y'
 
 if [[ -z "${shome:-}" ]]; then
   shome="$(cd -P -- "$(dirname -- "${BASH_SOURCE}")/.." && pwd -P)"
