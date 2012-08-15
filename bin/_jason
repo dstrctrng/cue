@@ -76,6 +76,9 @@ function require {
   local nm_library="$1"; shift
   local pth_lib="$(which_library "$nm_library")"
   if [[ -r "$pth_lib" ]]; then
+    if [[ "$#" == 0 ]]; then
+      set --
+    fi
     source "$pth_lib" "$@"
   fi
 }
