@@ -112,7 +112,7 @@ function prompt_git {
     else
       gstatus=': '
       clr_gstatus="${syellow}"
-      nm_branch='${scomment}<${sred}unknown${scomment}>'
+      nm_branch="${scomment}<${sred}unknown${scomment}>"
     fi
     echo " $nm_branch${clr_gstatus}${gstatus% *}${shigh}$nm_project${syellow}${gstatus#* }"
   fi
