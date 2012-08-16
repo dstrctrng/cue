@@ -90,8 +90,8 @@ function prompt_git {
   local tmp_status="$(mktemp -t XXXXXXXXX)"
   local tmp_branch="$(mktemp -t XXXXXXXXX)"
   git_status > $tmp_status &
-  git_project > $tmp_project &
   git_branch > $tmp_branch &
+  git_project > $tmp_project &
   wait
 
   local nm_project="$(cat $tmp_project)"
