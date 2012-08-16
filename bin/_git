@@ -12,7 +12,13 @@ function git_branch {
   local nm_branch="$(\git branch 2>&- | awk '$1 == "*" { $1=""; print }' || true)"
   nm_branch="${nm_branch# }"
   if [[ "$nm_branch" = "(no branch)" ]]; then
-    nm_branch="<$(\git show-ref --head | awk '$2 == "HEAD" { print $1}' | cut -b1-7)>"
+    local sha="$(\git show-ref HEAD | awk '{ print $1}' | cut -b1-7)"
+    local nm_ref="$(\git show-ref --heads --tags | grep ^$sha | cut -d/ -f3-)"
+    if [[ -n "$nm_ref" ]]; then
+      nm_branch="<$nm_ref>"
+    else
+      nm_branch="<$sha>"
+    fi
   fi
   echo "$nm_branch"
 } 
