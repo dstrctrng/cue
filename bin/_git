@@ -27,7 +27,7 @@ function git_branch {
     nm_branch="$nm_branch${scomment}<${syellow}$nm_tags${scomment}>"
   else
     if [[ -z "$nm_heads" ]]; then
-      nm_branch="$nm_branch${scomment}<${orange}$sha${scomment}>"
+      nm_branch="$nm_branch${scomment}<${sorange}$sha${scomment}>"
     fi
   fi
   
