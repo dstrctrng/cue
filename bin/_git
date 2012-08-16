@@ -88,13 +88,15 @@ function prompt_git {
   # optional git
   local tmp_project="$(mktemp -t XXXXXXXXX)"
   local tmp_status="$(mktemp -t XXXXXXXXX)"
+  local tmp_branch="$(mktemp -t XXXXXXXXX)"
   git_status > $tmp_status &
   git_project > $tmp_project &
+  git_branch > $tmp_branch &
   wait
 
   local nm_project="$(cat $tmp_project)"
   local gstatus="$(cat $tmp_status)"
-  local nm_branch="$(git_branch)"
+  local nm_branch="$(cat $tmp_branch)"
   rm -f $tmp_project $tmp_status
 
   if [[ -n $nm_project ]]; then
