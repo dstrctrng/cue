@@ -16,7 +16,11 @@ function git_branch {
 
   local nm_branch=""
   if [[ -n "$nm_heads" ]]; then
-    nm_branch="${shigh}$nm_heads"
+    if [[ "$nm_heads" = "production" ]]; then
+      nm_branch="${syellow}$nm_heads"
+    else
+      nm_branch="${shigh}$nm_heads"
+    fi
   fi
 
   if [[ -n "$nm_tags" ]]; then
@@ -108,7 +112,7 @@ function prompt_git {
     else
       gstatus=': '
       clr_gstatus="${syellow}"
-      nm_branch='<unknown>'
+      nm_branch='${scomment}<${sred}unknown${scomment}>'
     fi
     echo " $nm_branch${clr_gstatus}${gstatus% *}${shigh}$nm_project${syellow}${gstatus#* }"
   fi
