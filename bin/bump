@@ -1,0 +1,34 @@
+#!/bin/bash
+
+#/ NAME
+#/     bump -- increments a semver in a file or in git tags
+#/
+#/ SYNOPSIS
+#/     bump [major|minor|patch]
+#/     bump 1.2.3
+#/     bump
+#/       without arguments is equivalent to 'bump patch'
+
+# figure out the project root under which bin, lib live
+shome="$(cd -P -- "$(dirname -- "$BASH_SOURCE")/.." && pwd -P)"
+
+# load a jason bourne library
+source "$shome/bin/_treadstone"
+require 'bump'
+
+# entry point
+function main {
+  bump_version "$FLAGS_dirty" "$@"
+}
+
+# parse the command-line
+DEFINE_boolean 'dirty' "$FLAGS_FALSE" 'force bumping in unclean work area' 'f'
+parse_command_line "$@" || exit $?
+eval set -- "${FLAGS_ARGV}"
+
+if [[ "$#" = 0 ]]; then
+  set -- patch
+fi
+
+# pass arguments to entry point
+main "$@"
