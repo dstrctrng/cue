@@ -1,0 +1,132 @@
+#!/bin/bash
+
+: ${__meat__:=x}
+if [[ "$__meat__" != 'x' ]]; then
+  return 0
+fi
+__meat__='y'
+
+if [[ -z "${shome:-}" ]]; then
+  shome="$(cd -P -- "$(dirname -- "${BASH_SOURCE}")/.." && pwd -P)"
+fi
+
+# if getting-started bootstrap is detected, put this in the path
+# mainly useful for getopt on os x
+if [[ -d "$HOME/.getting-started/bootstrap" ]]; then
+  PATH="$HOME/.getting-started/bootstrap:$PATH"
+  hash -r
+fi
+
+function check_help {
+  # taken from shocco
+  if expr -- "$*" : ".*--help" >/dev/null; then
+    display_help
+    exit 0
+  fi
+}
+
+function display_help {
+  # taken from shocco
+  grep '^#/' <"$shome/bin/$(basename -- "$0")" | cut -c4-
+}
+
+# Exits the script with the last error code.  Servers as a marker in $0 to
+# begin ronn documentation until end of file.
+function __MAN__ {
+  exit "$!"
+}
+
+# Extracts ronn-style Markdown after __MAN__ to stdout.  If a line is "MAN", it
+# is assumed that a here document is used (for syntactical reasons).
+#
+# A limitation of detecting "MAN" will truncate the Markdown if "MAN" is a
+# legimate text.
+#
+#     __MAN__ << "MAN"
+#     raw ronn-style Markdown
+#     MAN
+function display_man {
+  awk '/^__MAN__/,/^MAN$/ {print}' <"$shome/bin/$(basename -- "$0")" | tail -n +2 | egrep -v '^MAN$'
+}
+
+function display_synopsis {
+  awk '/^#/ && !/^#!/ { print } /^[^#]/ || /^$/ { exit }' <"$shome/bin/$(basename -- "$0")" | cut -c3-
+}
+
+function which_library {
+  local library="$1"; shift
+  if [[ -r "$shome/bin/_$library" ]]; then
+    echo "$shome/bin/_$library"
+  elif [[ -r "$shome/.$library/bin/_profile" ]]; then
+    echo "$shome/.$library/bin/_profile"
+  elif [[ -r "$shome/.$library/.profile" ]]; then
+    echo "$shome/.$library/.profile"
+  else
+    local nm_library="${library%%/*}"
+    if [[ "$nm_library" != "$library" ]]; then
+      local nm_right="${library##*/}"
+      if [[ -r "$shome/.$nm_library/bin/_$nm_right" ]]; then
+        echo "$shome/.$nm_library/bin/_$nm_right"
+      fi
+    fi
+  fi
+}
+
+function require {
+  local nm_library="$1"; shift
+  local pth_lib="$(which_library "$nm_library")"
+  if [[ -r "$pth_lib" ]]; then
+    if [[ "$#" == 0 ]]; then
+      set --
+    fi
+    source "$pth_lib" "$@"
+  fi
+}
+
+function parse_command_line {
+  if ! FLAGS "$@"; then
+    if [[ "$flags_error" = "help requested" ]]; then
+      echo ""
+      display_help
+      exit 0
+    fi
+    
+    return 4
+  fi
+  return 0
+}
+
+function configure_logging {
+  # load log4sh (disabling properties file warning) and clear the default
+  # configuration
+  LOG4SH_CONFIGURATION='none' require 'log4sh'
+  log4sh_resetConfiguration
+
+  # set the global logging level to INFO
+  logger_setLevel INFO
+
+  # add and configure a FileAppender that outputs to STDERR, and activate the
+  # configuration
+  logger_addAppender stderr
+  appender_setType stderr FileAppender
+  appender_file_setFile stderr STDERR
+  appender_activateOptions stderr
+}
+
+function ryaml {
+  ruby -ryaml -e 'puts ARGV[1..-1].inject(YAML.load(File.read(ARGV[0]))) {|acc, key| acc[key] }' "$@"
+}
+
+function _main {
+  if [[ -z "$shome" ]]; then
+    shome="$(cd -P -- "$(dirname -- "${BASH_SOURCE}")/.." && pwd -P)"
+  fi
+
+  require 'shflags'
+
+  configure_logging
+  
+  PATH="$shome/bin:$PATH"
+}
+
+_main "$@"
