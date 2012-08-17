@@ -9,7 +9,7 @@ function git_project {
 }
 
 function git_branch {
-  local sha="$(\git reflog | head -1 | awk '{print $1}')"
+  local sha="$(\git rev-parse HEAD)"
 
   local nm_heads="$(\git show-ref --heads | grep ^$sha | cut -d/ -f3- | xargs -- | sed 's# #,#g')"
   local nm_tags="$(\git show-ref --tags | grep ^$sha | cut -d/ -f3- | xargs -- | sed 's# #,#g')"
