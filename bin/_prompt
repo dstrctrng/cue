@@ -6,7 +6,7 @@ function prompt_shell {
     echo ""
   else
     if [[ -n "${SHLVL_NAME:-}" ]]; then
-      echo "[$SHLVL_NAME]"
+      echo "${scomment}[${scyan}$SHLVL_NAME${scomment}]"
     else
       echo "<$(( SHLVL - SHLVL_INITIAL ))>"
     fi
@@ -54,7 +54,7 @@ function prompt {
 
   PS2="${shigh} > "
   PS1="${scomment}$(eval echo "${PS1_START}${PS1_LEFT}")${prn_filler}$(eval echo "${PS1_RIGHT}")${scomment}$(eval echo "${PS1_END}")${shigh}
--- ${prn_shell}${prn_error}:\$HISTCMD => "
+-- ${prn_shell}${prn_error}${scomment}:${shigh}\$HISTCMD ${shigh}=> ${shigh}"
 }
 
 PROMPT_COMMAND=prompt
