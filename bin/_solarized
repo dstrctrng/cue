@@ -53,7 +53,7 @@
 _esc="$(perl -e 'printf "%c", 27')"
 
 function _ansi {
-  echo -n "\[${_esc}[${1}m\]"
+  echo -n "${_esc}[${1}m"
 }
 
 _sbase00="1;33"
