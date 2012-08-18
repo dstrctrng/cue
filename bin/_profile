@@ -19,5 +19,5 @@ source "$CUE/bin/_prompt"
 : ${PS1_END:=' --'}
 
 PS1="\${scomment}${PS1_START}${PS1_LEFT}\${prn_filler}${PS1_RIGHT}\${scomment}${PS1_END}\${shigh}
---\${prn_shell}\${prn_error} => "
+--\${prn_shell}\${prn_error}:\$HISTCMD => "
 PS2="\${shigh} > "
