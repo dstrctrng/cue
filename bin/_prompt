@@ -1,7 +1,16 @@
 #!/bin/bash
 
 function prompt_shell {
-  echo " $SHLVL:$HISTCMD"
+  : ${SHLVL_INITIAL:=$SHLVL}
+  if [[ "${SHLVL}" = "${SHLVL_INITIAL}" ]]; then
+    echo " ${HISTCMD}"
+  else
+    if [[ -n "${SHLVL_NAME:-}" ]]; then
+      echo " [$SHLVL_NAME]:$HISTCMD"
+    else
+      echo " <$(( SHLVL - SHLVL_INITIAL ))>:$HISTCMD"
+    fi
+  fi
 }
 
 function prompt_error {
@@ -31,15 +40,14 @@ function prompt_filler {
 
 function prompt {
   local prompts="$(echo "${PS1_LEFT}${PS1_RIGHT}" | sed 's#${prn_##g; s#}# #g')"
+
   local p
-  for p in $prompts; do
+  for p in $prompts shell error; do
     fn_prn="prompt_${p}"
     nm_prn="prn_${p}"
     eval "$nm_prn=\$($fn_prn)"
   done
 
-  prn_shell="$(prompt_shell)"
-  prn_error="$(prompt_error)"
   prn_filler="$(prompt_filler "$(eval echo "${PS1_START}${PS1_LEFT}${PS1_RIGHT}${PS1_END}")")"
 }
 
