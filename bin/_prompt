@@ -41,7 +41,7 @@ function prompt_filler {
 function prompt {
   prn_error="$(prompt_error)"
 
-  local prompts="$(echo "${PS1_LEFT}${PS1_RIGHT}" | sed 's#${prn_##g; s#}# #g')"
+  local prompts="$(echo "${PS1_LEFT}${PS1_RIGHT}" | perl -ne 'map { print "$_\n" } m{\$\{prn_(\w+)\}}g' | sort -u)"
 
   local p
   for p in $prompts shell; do
