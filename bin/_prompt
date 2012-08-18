@@ -3,12 +3,12 @@
 function prompt_shell {
   : ${SHLVL_INITIAL:=$SHLVL}
   if [[ "${SHLVL}" = "${SHLVL_INITIAL}" ]]; then
-    echo " "
+    echo ""
   else
     if [[ -n "${SHLVL_NAME:-}" ]]; then
-      echo " [$SHLVL_NAME]"
+      echo "[$SHLVL_NAME]"
     else
-      echo =" <$(( SHLVL - SHLVL_INITIAL ))>"
+      echo "<$(( SHLVL - SHLVL_INITIAL ))>"
     fi
   fi
 }
@@ -17,7 +17,7 @@ function prompt_error {
   # optional error
   local err_last="$?"
   if [[ -n $err_last && $err_last != 0 ]]; then
-    echo " ${sorange}[${sred}$err_last${sorange}]${shigh}"
+    echo "${sorange}[${sred}$err_last${sorange}]${shigh}"
   fi
 }
 
