@@ -116,6 +116,8 @@ xviolet='#6c71c4'
 xyellow='#b58900'
 
 : ${sscheme:=dark}
+export sscheme
+
 cmd_xc="$(which xtermcontrol 2>&-)"
 
 function sdark {
