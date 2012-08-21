@@ -2,15 +2,13 @@
 
 if [[ "$#" > 0 ]]; then
   CUE="$1"; shift
+else
+  CUE="$(cd -P -- "$(dirname -- "${BASH_SOURCE}")/.." && pwd -P)"
 fi  
-
-: ${CUE:="$(cd -P -- "$(dirname -- "${BASH_SOURCE}")/.." && pwd -P)"}
 
 source "$CUE/bin/_nim"
 source "$CUE/bin/_bindings"
-
 source "$CUE/bin/_solarized"
-
 source "$CUE/bin/_prompt"
 
 : ${PS1_START:='--'}
