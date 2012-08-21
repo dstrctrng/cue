@@ -25,7 +25,8 @@ function prompt_filler {
   local prn_prompt="$1"; shift
   # filler
   if [[ -z ${COLUMNS:-} ]]; then
-    eval $(resize)
+    echo ""
+    return
   fi
 
   if [[ -n ${COLUMNS:-} ]]; then
