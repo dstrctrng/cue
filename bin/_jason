@@ -121,6 +121,12 @@ function random_str {
   echo "$(date +%s).$$.$RANDOM"
 }
 
+function runmany {
+  local cpu="$1"; shift
+  local args="$1"; shift
+  xargs -P $cpu -n $args -- bash -c "$*"
+}
+
 function _main {
   if [[ -z "$shome" ]]; then
     shome="$(cd -P -- "$(dirname -- "${BASH_SOURCE}")/.." && pwd -P)"
