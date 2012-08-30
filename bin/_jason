@@ -10,12 +10,14 @@ if [[ -z "${shome:-}" ]]; then
   shome="$(cd -P -- "$(dirname -- "${BASH_SOURCE}")/.." && pwd -P)"
 fi
 
-# if getting-started bootstrap is detected, put this in the path
-# mainly useful for getopt on os x
-if [[ -d "$HOME/.getting-started/bootstrap" ]]; then
-  PATH="$HOME/.getting-started/bootstrap:$PATH"
-  hash -r
-fi
+function get_started {
+  # if getting-started bootstrap is detected, put this in the path
+  # mainly useful for getopt on os x
+  if [[ -d "$HOME/.getting-started/bootstrap" ]]; then
+    PATH="$HOME/.getting-started/bootstrap:$PATH"
+    hash -r
+  fi
+}
 
 function check_help {
   # taken from shocco
