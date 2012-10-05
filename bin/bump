@@ -18,6 +18,10 @@ require 'bump'
 
 # entry point
 function main {
+  if [[ "$#" = 0 ]]; then
+    set -- patch
+  fi
+
   bump_version "$FLAGS_dirty" "$@"
 }
 
@@ -25,10 +29,6 @@ function main {
 DEFINE_boolean 'dirty' "$FLAGS_FALSE" 'force bumping in unclean work area' 'f'
 parse_command_line "$@" || exit $?
 eval set -- "${FLAGS_ARGV}"
-
-if [[ "$#" = 0 ]]; then
-  set -- patch
-fi
 
 # pass arguments to entry point
 main "$@"
