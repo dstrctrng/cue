@@ -86,6 +86,25 @@ function require {
 }
 
 function parse_command_line {
+  if [[ "$FLAGS_SUB" = "$FLAGS_TRUE" ]]; then
+    local argv
+    declare -a argv
+
+    local argc="0"
+    local arg
+    for arg in "$@"; do
+      if [[ ! "$arg" =~ ^- ]]; then
+        argv[argc]="--"
+        argc="$((argc + 1))"
+      fi
+
+      argv[argc]="$arg"
+      argc="$((argc + 1))"
+    done
+
+    set -- "${argv[@]}"
+  fi
+
   if ! FLAGS "$@"; then
     if [[ "$flags_error" = "help requested" ]]; then
       echo ""
