@@ -1,14 +1,1 @@
-#!/bin/bash
-
-#/ NAME
-#/     jason -- uses the jason bourne lib
-#/
-#/ SYNOPSIS
-#/     jason
-
-# figure out the project root under which bin, lib live
-shome="$(cd -P -- "$(dirname -- "$BASH_SOURCE")/.." && pwd -P)"
-
-# load a jason bourne library
-source "$shome/bin/_treadstone"
-require 'sub' "$BASH_SOURCE" "$@"
+stub
