@@ -1,0 +1,37 @@
+function sub {
+  local sub_base="$1"; shift
+
+  FLAGS_SUB="$FLAGS_TRUE"
+  parse_command_line "$@" || exit $?
+  eval set -- "${FLAGS_ARGV}" 
+
+  if [[ "$#" > 0 ]]; then
+    if [[ ! "$1" =~ ^- ]]; then
+      local sub_cmd="$(command -v "${sub_base}-$1" || true)"
+      if [[ ! -x "$sub_cmd" ]]; then
+        sub_cmd="$shome/libexec/${sub_base}-$1"
+      fi
+
+      if [[ -x "$sub_cmd" ]]; then
+        shift
+        exec "$sub_cmd" "$@"
+      fi
+    fi
+  fi
+
+  local sub_cmd="$shome/libexec/${sub_base}"
+  if [[ -x "$sub_cmd" ]]; then
+    exec "$sub_cmd" "$@"
+  else
+    main "$@"
+  fi
+}
+
+function sub_require {
+  local bsource="$1"; shift
+  sub "$(basename "$bsource")" "$@"
+}
+
+if [[ "$#" > 0 ]]; then
+  sub_require "$@"  
+fi

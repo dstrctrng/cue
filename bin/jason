@@ -11,14 +11,4 @@ shome="$(cd -P -- "$(dirname -- "$BASH_SOURCE")/.." && pwd -P)"
 
 # load a jason bourne library
 source "$shome/bin/_treadstone"
-require 'sub'
-
-# parse the command-line
-DEFINE_boolean 'nancy' "$FLAGS_FALSE" 'What is her name?' 'n'
-
-# entry point
-function main {
-  echo "$FLAGS_nancy"
-}
-
-sub "$(basename "$BASH_SOURCE")" "$@"
+require 'sub' "$BASH_SOURCE" "$@"
