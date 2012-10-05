@@ -1,5 +1,8 @@
+#!/bin/bash
+
 function sub {
-  local sub_base="$1"; shift
+  local bsource="$1"; shift
+  local sub_base="$(basename "$bsource")"
 
   FLAGS_SUB="$FLAGS_TRUE"
   parse_command_line "$@" || exit $?
@@ -20,18 +23,13 @@ function sub {
   fi
 
   local sub_cmd="$shome/libexec/${sub_base}"
-  if [[ -x "$sub_cmd" ]]; then
+  if [[ -x "$sub_cmd" && "$sub_cmd" != "$bsource" ]]; then
     exec "$sub_cmd" "$@"
   else
     main "$@"
   fi
 }
 
-function sub_require {
-  local bsource="$1"; shift
-  sub "$(basename "$bsource")" "$@"
-}
-
 if [[ "$#" > 0 ]]; then
-  sub_require "$@"  
+  sub "$@"  
 fi
