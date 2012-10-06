@@ -13,11 +13,11 @@ shome="$(cd -P -- "$(dirname -- "$BASH_SOURCE")/.." && pwd -P)"
 source "$shome/bin/_treadstone"
 
 # parse the command-line
-DEFINE_boolean 'nancy' "$FLAGS_FALSE" 'What is her name?' 'n'
+DEFINE_string 'name' "Nancy" 'What is her name?' 'n'
 
 # entry point
 function main {
-  echo "$FLAGS_nancy"
+  echo "His girlfriend is $FLAGS_name"
 }
 
 require 'sub' "$BASH_SOURCE" "$@"

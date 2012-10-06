@@ -3,10 +3,13 @@
 function sub {
   local bsource="$1"; shift
   local sub_base="$(basename "$bsource")"
+  local sub_cmd="$shome/libexec/${sub_base}"
 
-  FLAGS_SUB="$FLAGS_TRUE"
-  parse_command_line "$@" || exit $?
-  eval set -- "${FLAGS_ARGV}" 
+  if [[ "$sub_cmd" == "$bsource" ]]; then
+    FLAGS_SUB="$FLAGS_TRUE"
+    parse_command_line "$@" || exit $?
+    eval set -- "${FLAGS_ARGV}"
+  fi
 
   if [[ "$#" > 0 ]]; then
     if [[ ! "$1" =~ ^- ]]; then
@@ -21,8 +24,7 @@ function sub {
       fi
     fi
   fi
-
-  local sub_cmd="$shome/libexec/${sub_base}"
+ 
   if [[ -x "$sub_cmd" && "$sub_cmd" != "$bsource" ]]; then
     exec "$sub_cmd" "$@"
   else

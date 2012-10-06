@@ -1,10 +1,10 @@
 #!/bin/bash
 
 #/ NAME
-#/     jason-bourne-again  -- uses the jason bourne lib
+#/     jason-bourne  -- uses the jason bourne lib
 #/
 #/ SYNOPSIS
-#/     jason bourne again
+#/     jason bourne
 
 # figure out the project root under which bin, lib live
 shome="$(cd -P -- "$(dirname -- "$BASH_SOURCE")/.." && pwd -P)"
@@ -13,11 +13,11 @@ shome="$(cd -P -- "$(dirname -- "$BASH_SOURCE")/.." && pwd -P)"
 source "$shome/bin/_treadstone"
 
 # parse the command-line
-DEFINE_string 'sequel' "fists" 'supremacy' 's'
+DEFINE_string 'weapons' "fists" 'supremacy' 's'
 
 # entry point
 function main {
-  echo "$FLAGS_sequel"
+  echo "He fights with $FLAGS_weapons"
 }
 
 require 'sub' "$BASH_SOURCE" "$@"

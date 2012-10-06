@@ -28,8 +28,11 @@ function check_help {
 }
 
 function display_help {
+  flags_help
+  echo
+
   # taken from shocco
-  grep '^#/' <"$shome/bin/$(basename -- "$0")" | cut -c4-
+  grep '^#/' <"$shome/$(basename $(dirname -- "$0"))/$(basename -- "$0")" | cut -c4-
 }
 
 # Exits the script with the last error code.  Servers as a marker in $0 to
@@ -108,11 +111,11 @@ function parse_command_line {
   fi
 
   if ! FLAGS "$@"; then
-    if [[ "$flags_error" = "help requested" ]]; then
+  if [[ "$flags_error" = "help requested" ]]; then
       echo ""
-      display_help
-      exit 0
-    fi
+    display_help
+    exit 0
+  fi
     
     return 4
   fi
