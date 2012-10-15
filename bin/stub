@@ -1,10 +1,10 @@
 #!/bin/bash
 
 #/ NAME
-#/     jason -- uses the jason bourne lib
+#/     stub -- symlink catchall to implement 37signals/sub interface
 #/
 #/ SYNOPSIS
-#/     jason
+#/     ln -nfs stub bin/stubbed-command
 
 # figure out the project root under which bin, lib live
 shome="$(cd -P -- "$(dirname -- "$BASH_SOURCE")/.." && pwd -P)"
