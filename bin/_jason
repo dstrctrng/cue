@@ -90,35 +90,21 @@ function require {
 
 function parse_command_line {
   if [[ "$FLAGS_SUB" = "$FLAGS_TRUE" && "$@" > 0 ]]; then
-    local argv
-    declare -a argv
-
-    local argc="0"
-    local arg
-    local passthrough=
-    for arg in "$@"; do
-      if [[ -z "$passthrough" && ! "$arg" =~ ^- ]]; then
-        argv[argc]="--"
-        argc="$((argc + 1))"
-        passthrough=1
-      fi
-
-      argv[argc]="$arg"
-      argc="$((argc + 1))"
-    done
-
-    set -- "${argv[@]}"
+    export POSIXLY_CORRECT=1
   fi
 
   if ! FLAGS "$@"; then
-  if [[ "$flags_error" = "help requested" ]]; then
+    unset POSIXLY_CORRECT
+    if [[ "$flags_error" = "help requested" ]]; then
       echo ""
-    display_help
-    exit 0
-  fi
+      display_help
+      exit 0
+    fi
     
     return 4
   fi
+
+  unset POSIXLY_CORRECT
   return 0
 }
 
