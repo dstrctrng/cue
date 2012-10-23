@@ -10,9 +10,7 @@
 shome="$(cd -P -- "$(dirname -- "$BASH_SOURCE")/.." && pwd -P)"
 
 # load a jason bourne library
-source "$shome/bin/_treadstone"
-
-# parse the command-line
+source "$shome/libexec/_treadstone"
 
 # entry point
 function main {
@@ -24,10 +22,8 @@ function main {
   local dollar='$'
   local nm_command="$1"; shift
 
-  ln -vs stub "$shome/bin/$nm_command"
-  cat > "$shome/libexec/$nm_command" << EOF
-    echo arguments are ${dollar}@"
-EOF
+  ln -nfsv stub "$shome/bin/$nm_command"
+  cp "$0" "$shome/libexec/$nm_command"
   chmod 755 "$shome/libexec/$nm_command"
 
   logger_info "$nm_command is stubbed at bin/$nm_command"

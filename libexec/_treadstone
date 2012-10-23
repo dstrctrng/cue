@@ -4,5 +4,5 @@ if [[ -z "${shome:-}" ]]; then
   shome="$(cd -P -- "$(dirname -- "${BASH_SOURCE}")/.." && pwd -P)"
 fi
 
-source "$shome/bin/_jason"
+source "$shome/libexec/_jason"
 set -fue

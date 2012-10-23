@@ -51,19 +51,23 @@ function __MAN__ {
 #     raw ronn-style Markdown
 #     MAN
 function display_man {
-  awk '/^__MAN__/,/^MAN$/ {print}' <"$shome/bin/$(basename -- "$0")" | tail -n +2 | egrep -v '^MAN$'
+  awk '/^__MAN__/,/^MAN$/ {print}' <"$0" | tail -n +2 | egrep -v '^MAN$'
 }
 
 function display_synopsis {
-  awk '/^#/ && !/^#!/ { print } /^[^#]/ || /^$/ { exit }' <"$shome/bin/$(basename -- "$0")" | cut -c3-
+  awk '/^#/ && !/^#!/ { print } /^[^#]/ || /^$/ { exit }' <"$0" | cut -c3-
 }
 
 function which_library {
   local library="$1"; shift
   if [[ -r "$shome/bin/_$library" ]]; then
     echo "$shome/bin/_$library"
+  elif [[ -r "$shome/libexec/_$library" ]]; then
+    echo "$shome/libexec/_$library"
   elif [[ -r "$shome/.$library/bin/_profile" ]]; then
     echo "$shome/.$library/bin/_profile"
+  elif [[ -r "$shome/.$library/libexec/_profile" ]]; then
+    echo "$shome/.$library/libexec/_profile"
   elif [[ -r "$shome/.$library/.profile" ]]; then
     echo "$shome/.$library/.profile"
   else
@@ -72,6 +76,8 @@ function which_library {
       local nm_right="${library##*/}"
       if [[ -r "$shome/.$nm_library/bin/_$nm_right" ]]; then
         echo "$shome/.$nm_library/bin/_$nm_right"
+      elif [[ -r "$shome/.$nm_library/libexec/_$nm_right" ]]; then
+        echo "$shome/.$nm_library/libexec/_$nm_right"
       fi
     fi
   fi
