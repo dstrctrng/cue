@@ -22,8 +22,9 @@ function main {
   local dollar='$'
   local nm_command="$1"; shift
 
-  ln -nfsv stub "$shome/bin/$nm_command"
-  cp "$0" "$shome/libexec/$nm_command"
+
+  cp "$shome/libexec/stub" "$shome/libexec/$nm_command"
+  ln -nfsv $nm_command "$shome/bin/$nm_command"
   chmod 755 "$shome/libexec/$nm_command"
 
   logger_info "$nm_command is stubbed at bin/$nm_command"
