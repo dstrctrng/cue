@@ -6,10 +6,10 @@ else
   CUE="$(cd -P -- "$(dirname -- "${BASH_SOURCE}")/.." && pwd -P)"
 fi  
 
-source "$CUE/bin/_nim"
-source "$CUE/bin/_bindings"
-source "$CUE/bin/_solarized"
-source "$CUE/bin/_prompt"
+source "$CUE/libexec/_nim"
+source "$CUE/libexec/_bindings"
+source "$CUE/libexec/_solarized"
+source "$CUE/libexec/_prompt"
 
 : ${PS1_START:='--'}
 : ${PS1_LEFT:='${prn_pwd}'}
