@@ -749,7 +749,6 @@ _flags_parseGetopt()
     # handle special case help flag
     if [ "${_flags_name_}" = 'help' ]; then
       if [ ${FLAGS_help} -eq ${FLAGS_TRUE} ]; then
-        flags_help
         flags_error='help requested'
         flags_return=${FLAGS_FALSE}
         break
@@ -1007,3 +1006,7 @@ flags_reset()
 
   unset flags_name_ flags_type_ flags_strToEval_
 }
+
+# parse stops on first non-option arg
+FLAGS_SUB="$FLAGS_FALSE"
+

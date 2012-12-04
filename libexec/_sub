@@ -1,0 +1,53 @@
+#!/bin/bash
+
+: ${_JASON_RUBY:=}
+: ${_JASON_WHICH_RUBY:=deploy_ruby}
+
+function sub {
+  local bsource="$1"; shift
+  local sub_base="$(basename "$bsource")"
+  local bsource_cmd="$shome/libexec/${sub_base}"
+
+  local ruby_loader=
+  if [[ -n "$_JASON_RUBY" ]]; then
+    ruby_loader="rvm-exec $_JASON_RUBY "
+  fi
+
+  if [[ "$bsource_cmd" = "$bsource" ]]; then
+    FLAGS_SUB="$FLAGS_TRUE"
+    parse_command_line "$@" || exit $?
+    eval set -- "${FLAGS_ARGV}"
+  fi
+
+  if [[ "$#" > 0 ]]; then
+    if [[ ! "$1" =~ ^- ]]; then
+      local sub_cmd="$(command -v "${sub_base}-$1" || true)"
+      if [[ ! -x "$sub_cmd" ]]; then
+        sub_cmd="$shome/libexec/${sub_base}-$1"
+      fi
+
+      if [[ -x "$sub_cmd" ]]; then
+        shift
+        exec ${ruby_loader}"$sub_cmd" "$@"
+      fi
+    fi
+  fi
+
+  if [[ -x "$bsource_cmd" && "$bsource_cmd" != "$bsource" ]]; then
+    exec ${ruby_loader}"$bsource_cmd" "$@"
+  else
+    main "$@"
+  fi
+}
+
+if [[ "$shome/config/deploy.yml" ]]; then
+  export _JASON_RUBY="$(ryaml "$shome/config/deploy.yml" "$_JASON_WHICH_RUBY")"
+fi
+
+if [[ ! -x "$(which rvm-exec 2>&1 || true)" ]]; then
+  PATH="$PATH:$HOME/.rvm/bin:/usr/local/rvm/bin"
+fi
+
+if [[ "$#" > 0 ]]; then
+  sub "$@"  
+fi

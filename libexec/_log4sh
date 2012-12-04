@@ -3721,6 +3721,7 @@ log4sh_cleanup()
 #*/
 _log4sh_cleanup()
 {
+  set +x
   _lc__trap=$1
   ${__LOG4SH_INFO} "_log4sh_cleanup(): the ${_lc__trap} signal was caught"
 

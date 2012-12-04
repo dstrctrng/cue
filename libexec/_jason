@@ -10,12 +10,14 @@ if [[ -z "${shome:-}" ]]; then
   shome="$(cd -P -- "$(dirname -- "${BASH_SOURCE}")/.." && pwd -P)"
 fi
 
-# if getting-started bootstrap is detected, put this in the path
-# mainly useful for getopt on os x
-if [[ -d "$HOME/.getting-started/bootstrap" ]]; then
-  PATH="$HOME/.getting-started/bootstrap:$PATH"
-  hash -r
-fi
+function get_started {
+  # if getting-started bootstrap is detected, put this in the path
+  # mainly useful for getopt on os x
+  if [[ -d "$HOME/.getting-started/bootstrap" ]]; then
+    PATH="$HOME/.getting-started/bootstrap:$PATH"
+    hash -r
+  fi
+}
 
 function check_help {
   # taken from shocco
@@ -26,8 +28,11 @@ function check_help {
 }
 
 function display_help {
+  flags_help
+  echo
+
   # taken from shocco
-  grep '^#/' <"$shome/bin/$(basename -- "$0")" | cut -c4-
+  grep '^#/' <"$shome/$(basename $(dirname -- "$0"))/$(basename -- "$0")" | cut -c4-
 }
 
 # Exits the script with the last error code.  Servers as a marker in $0 to
@@ -46,19 +51,23 @@ function __MAN__ {
 #     raw ronn-style Markdown
 #     MAN
 function display_man {
-  awk '/^__MAN__/,/^MAN$/ {print}' <"$shome/bin/$(basename -- "$0")" | tail -n +2 | egrep -v '^MAN$'
+  awk '/^__MAN__/,/^MAN$/ {print}' <"$0" | tail -n +2 | egrep -v '^MAN$'
 }
 
 function display_synopsis {
-  awk '/^#/ && !/^#!/ { print } /^[^#]/ || /^$/ { exit }' <"$shome/bin/$(basename -- "$0")" | cut -c3-
+  awk '/^#/ && !/^#!/ { print } /^[^#]/ || /^$/ { exit }' <"$0" | cut -c3-
 }
 
 function which_library {
   local library="$1"; shift
   if [[ -r "$shome/bin/_$library" ]]; then
     echo "$shome/bin/_$library"
+  elif [[ -r "$shome/libexec/_$library" ]]; then
+    echo "$shome/libexec/_$library"
   elif [[ -r "$shome/.$library/bin/_profile" ]]; then
     echo "$shome/.$library/bin/_profile"
+  elif [[ -r "$shome/.$library/libexec/_profile" ]]; then
+    echo "$shome/.$library/libexec/_profile"
   elif [[ -r "$shome/.$library/.profile" ]]; then
     echo "$shome/.$library/.profile"
   else
@@ -67,6 +76,8 @@ function which_library {
       local nm_right="${library##*/}"
       if [[ -r "$shome/.$nm_library/bin/_$nm_right" ]]; then
         echo "$shome/.$nm_library/bin/_$nm_right"
+      elif [[ -r "$shome/.$nm_library/libexec/_$nm_right" ]]; then
+        echo "$shome/.$nm_library/libexec/_$nm_right"
       fi
     fi
   fi
@@ -84,7 +95,12 @@ function require {
 }
 
 function parse_command_line {
+  if [[ "$FLAGS_SUB" = "$FLAGS_TRUE" && "$@" > 0 ]]; then
+    export POSIXLY_CORRECT=1
+  fi
+
   if ! FLAGS "$@"; then
+    unset POSIXLY_CORRECT
     if [[ "$flags_error" = "help requested" ]]; then
       echo ""
       display_help
@@ -93,6 +109,8 @@ function parse_command_line {
     
     return 4
   fi
+
+  unset POSIXLY_CORRECT
   return 0
 }
 
@@ -114,7 +132,21 @@ function configure_logging {
 }
 
 function ryaml {
-  ruby -ryaml -e 'puts ARGV[1..-1].inject(YAML.load(File.read(ARGV[0]))) {|acc, key| acc[key] }' "$@"
+  ruby -ryaml -e 'def ps x; unless x.nil?; puts (x.class == String || x.class == Fixnum) ? x : x.to_yaml; end; end; ps ARGV[1..-1].inject(YAML.load(File.read(ARGV[0]))) {|acc, key| acc[acc.class == Array ? key.to_i : key] }' "$@" 2>&-
+}
+
+function random_str {
+  echo "$(date +%s).$$.$RANDOM"
+}
+
+function runmany {
+  local cpu="$1"; shift
+  local args="$1"; shift
+  if [[ "$#" = 0 ]]; then
+    cat
+  else
+    echo "$@"
+  fi | xargs -P $cpu -n $args -- bash -c "$*" ""
 }
 
 function _main {
