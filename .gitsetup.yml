@@ -1,0 +1,5 @@
+---
+remotes:
+  primary: git@github.com:destructuring/cue
+  secondary: git@destructuring.org:destructuring/cue
+  sh: https://github.com/destructuring/jason
