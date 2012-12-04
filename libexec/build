@@ -1,10 +1,10 @@
 #!/bin/bash
 
 #/ NAME
-#/     watch -- watch jekyll and compass
+#/     build -- builds static site using jekyll
 #/
 #/ SYNOPSIS
-#/     watch site
+#/     build site
 
 # figure out the project root under which bin, lib live
 shome="$(cd -P -- "$(dirname -- "$0")/.." && pwd -P)"
@@ -22,7 +22,7 @@ function main {
   local nm_component="$1"; shift
   case "$nm_component" in 
     site)
-      watch_site "$@"
+      build_site "$@"
       ;;
     *)
       logger_fatal "don't know how to build ${nm_component}"
@@ -31,15 +31,20 @@ function main {
   esac
 }
 
-function watch_site {
+# build the site with jekyll
+function build_site {
   export BUNDLE_GEMFILE="$shome/.doc/Gemfile"
   bundle check 2>&1 >/dev/null || { bundle install --quiet --local --path vendor/bundle || bundle check > /dev/null; }
 
   local old_path="$PATH"
   PATH="$PATH:$shome/libexec"
 
+  pushd "$shome/site/theme" > /dev/null
+  bundle exec compass compile
+  popd > /dev/null
+
   pushd "$shome/site" > /dev/null
-  bundle exec foreman start
+  bundle exec jekyll
   popd > /dev/null
 
   PATH="$old_path"
