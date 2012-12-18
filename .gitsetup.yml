@@ -1,4 +1,0 @@
----
-remotes:
-  primary: git@github.com:destructuring/mixin-bump
-  secondary: git@destructuring.org:destructuring/mixin-bump
