@@ -1,5 +1,6 @@
 #!/bin/bash
 
+if [[ "${BASEH_SOURCE##*/}" = "_sub" ]]; then
 function sub {
   local bsource="$1"; shift
   local sub_base="$(basename "$bsource")"
@@ -32,6 +33,11 @@ function sub {
   fi
 }
 
-if [[ "$#" > 0 ]]; then
-  sub "$@"  
+  if [[ "$#" > 0 ]]; then
+    sub "$@"  
+  fi
+else
+  shome="$(cd -P -- "$(dirname -- "$BASH_SOURCE")/.." && pwd -P)"
+  source "$shome/libexec/_jason"
+  require 'sub' "$BASH_SOURCE" "$@"
 fi
