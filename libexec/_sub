@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [[ "${BASEH_SOURCE##*/}" = "_sub" ]]; then
+if [[ "${BASH_SOURCE##*/}" = "_sub" ]]; then
 function sub {
   local bsource="$1"; shift
   local sub_base="$(basename "$bsource")"
