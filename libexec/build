@@ -10,7 +10,7 @@
 shome="$(cd -P -- "$(dirname -- "$0")/.." && pwd -P)"
 
 # load a meat library
-source "$shome/bin/_prime" "$@"
+source "$shome/libexec/_jason" "$@"
 
 # entry point
 function main {
