@@ -1,0 +1,126 @@
+#!/bin/bash
+
+function bump_version {
+  local dirty="$1"; shift
+
+  if [[ "$dirty" = "$FLAGS_FALSE" ]]; then
+    ensure_clean_git_status
+  fi
+
+  local_file=
+  if [[ -f VERSION || -L VERSION ]]; then
+      local_file=1
+    if [[ ! -e VERSION ]]; then
+      logger_fatal "cannot write to VERSION file"
+      exit 1
+    fi
+  fi
+
+  tmp_version=$(mktemp -t XXXXXXXXX)
+  if [[ -n $local_file ]]; then
+    cat VERSION | perl -ne 'm{^\s*v?(\d+)\.(\d+)\.(\d+)\s*$} && printf("%03d.%03d.%03d %d.%d.%d\n",$1,$2,$3,$1,$2,$3)' | sort -r | head -1 | awk '{print $2}' > $tmp_version
+  else
+    git tag | perl -ne 'm{^v(\d+)\.(\d+)\.(\d+)$} && printf("%03d.%03d.%03d %d.%d.%d\n",$1,$2,$3,$1,$2,$3)' | sort -r | head -1 | awk '{print $2}' > $tmp_version
+  fi
+
+  if [[ ! -s "$tmp_version" ]]; then
+    logger_fatal "need at least one git tag (in the form v0.0.0) or a version in file VERSION (in the form 0.0.0)"
+    exit 1
+  fi
+
+  case "$1" in
+    patch|minor|major)
+      bump=$1; shift
+      set -- $(cat $tmp_version | sed 's#\.# #g')
+      case "$bump" in
+        patch)
+          echo "$1.$2.$(($3 + 1))"
+          ;;
+        minor)
+          echo "$1.$(($2 + 1)).0"
+          ;;
+        major)
+          echo "$(($1 + 1)).0.0"
+          ;;
+      esac > $tmp_version
+      ;;
+    *)
+      ver_new=$1; shift
+      ver_new=${ver_new#v}
+      echo $ver_new > $tmp_version
+      ;;
+  esac
+
+  ver_new=$(cat $tmp_version)
+  set -- $(echo "$ver_new" | sed 's#\.# #g') 0
+  M=$1; shift
+  m=$1; shift
+  p=$1; shift
+
+  (echo "$(($M+0)).$(($m+0)).$(($p+0))" > $tmp_version) 2>&-
+  ver_new_same=$(cat $tmp_version)
+
+  if [[ $ver_new != $ver_new_same ]]; then
+    logger_fatal "invalid version: $ver_new"
+    exit 1
+  fi
+
+  ver_bumped="v$(cat $tmp_version)"
+  rm -f $tmp_version
+  ensure_git_tag_available $ver_bumped
+
+  if [[ -n $local_file ]]; then
+    echo ${ver_bumped#v} > VERSION
+    git add VERSION
+    if [[ -f Gemfile ]]; then
+      bundle check 2>&1 >/dev/null || { bundle --quiet install --local --path vendor/bundle || bundle check > /dev/null; }
+      git add Gemfile.lock
+    fi
+
+    git commit -m "bump: $ver_bumped"
+    git push
+  fi
+
+  git_tag "$ver_bumped"
+  echo $ver_bumped
+}
+
+function ensure_git_tag_available {
+  version=$1; shift
+  git fetch --tags
+  remote_sha=$(git ls-remote origin $version | awk '{print $1}')
+  if [[ -n $remote_sha ]]; then
+    logger_fatal "already a remote tag $version, bump again"
+    exit 1
+  fi
+
+  local_sha=$(git show-ref $version | awk '{print $1}')
+  if [[ -n $local_sha ]]; then
+    logger_fatal "already a local tag $version"
+    exit 1
+  fi
+}
+
+function git_tag {
+  local version=$1; shift
+
+  ensure_git_tag_available "$version"
+
+  git tag $version
+  git push origin tag $version
+  remote_sha=$(git ls-remote origin $version | awk '{print $1}')
+  local_sha=$(git show-ref $version | awk '{print $1}')
+  if [[ $remote_sha != $local_sha ]]; then
+    logger_fatal "remote tag $version does not match local SHA"
+    exit 1
+  fi
+}
+
+function ensure_clean_git_status {
+  local lines=$(git status -s -uno | wc -l | awk '{print $1}')
+  if [[ $lines != "0" ]]; then
+    logger_fatal "git status is not clean, cannot tag"
+    git status -s -uno
+    exit 1
+  fi
+}
