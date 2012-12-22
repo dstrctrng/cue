@@ -3,3 +3,4 @@ remotes:
   primary: git@github.com:destructuring/cue
   secondary: git@bitbucket.org:destructuring/cue
   sh: https://github.com/destructuring/jason
+  bump: https://github.com/destructuring/mixin-bump
