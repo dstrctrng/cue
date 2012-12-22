@@ -20,7 +20,7 @@ function bump_version {
   if [[ -n $local_file ]]; then
     cat VERSION | perl -ne 'm{^\s*v?(\d+)\.(\d+)\.(\d+)\s*$} && printf("%03d.%03d.%03d %d.%d.%d\n",$1,$2,$3,$1,$2,$3)' | sort -r | head -1 | awk '{print $2}' > $tmp_version
   else
-    git tag | perl -ne 'm{^v(\d+)\.(\d+)\.(\d+)$} && printf("%03d.%03d.%03d %d.%d.%d\n",$1,$2,$3,$1,$2,$3)' | sort -r | head -1 | awk '{print $2}' > $tmp_version
+    $(type -P git) tag | perl -ne 'm{^v(\d+)\.(\d+)\.(\d+)$} && printf("%03d.%03d.%03d %d.%d.%d\n",$1,$2,$3,$1,$2,$3)' | sort -r | head -1 | awk '{print $2}' > $tmp_version
   fi
 
   if [[ ! -s "$tmp_version" ]]; then
@@ -71,14 +71,14 @@ function bump_version {
 
   if [[ -n $local_file ]]; then
     echo ${ver_bumped#v} > VERSION
-    git add VERSION
+    $(type -P git) add VERSION
     if [[ -f Gemfile ]]; then
       bundle check 2>&1 >/dev/null || { bundle --quiet install --local --path vendor/bundle || bundle check > /dev/null; }
-      git add Gemfile.lock
+      $(type -P git) add Gemfile.lock
     fi
 
-    git commit -m "bump: $ver_bumped"
-    git push
+    $(type -P git) commit -m "bump: $ver_bumped"
+    $(type -P git) push
   fi
 
   git_tag "$ver_bumped"
@@ -87,14 +87,14 @@ function bump_version {
 
 function ensure_git_tag_available {
   version=$1; shift
-  git fetch --tags
-  remote_sha=$(git ls-remote origin $version | awk '{print $1}')
+  $(type -P git) fetch --tags
+  remote_sha=$($(type -P git) ls-remote origin $version | awk '{print $1}')
   if [[ -n $remote_sha ]]; then
     logger_fatal "already a remote tag $version, bump again"
     exit 1
   fi
 
-  local_sha=$(git show-ref $version | awk '{print $1}')
+  local_sha=$($(type -P git) show-ref $version | awk '{print $1}')
   if [[ -n $local_sha ]]; then
     logger_fatal "already a local tag $version"
     exit 1
@@ -106,10 +106,10 @@ function git_tag {
 
   ensure_git_tag_available "$version"
 
-  git tag $version
-  git push origin tag $version
-  remote_sha=$(git ls-remote origin $version | awk '{print $1}')
-  local_sha=$(git show-ref $version | awk '{print $1}')
+  $(type -P git) tag $version
+  $(type -P git) push origin tag $version
+  remote_sha=$($(type -P git) ls-remote origin $version | awk '{print $1}')
+  local_sha=$($(type -P git) show-ref $version | awk '{print $1}')
   if [[ $remote_sha != $local_sha ]]; then
     logger_fatal "remote tag $version does not match local SHA"
     exit 1
@@ -117,10 +117,10 @@ function git_tag {
 }
 
 function ensure_clean_git_status {
-  local lines=$(git status -s -uno | wc -l | awk '{print $1}')
+  local lines=$($(type -P git) status -s -uno | wc -l | awk '{print $1}')
   if [[ $lines != "0" ]]; then
     logger_fatal "git status is not clean, cannot tag"
-    git status -s -uno
+    $(type -P git) status -s -uno
     exit 1
   fi
 }

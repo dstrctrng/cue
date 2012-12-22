@@ -1,18 +1,18 @@
 #!/bin/bash
 
 function git_project {
-  local gitname=$(\git config remote.origin.name)
+  local gitname=$($(type -P git) config remote.origin.name)
   if [[ -z $gitname ]]; then
-    gitname=$(basename $(\git config remote.origin.url) .git)
+    gitname=$(basename $($(type -P git) config remote.origin.url) .git)
   fi
   echo "$gitname"
 }
 
 function git_branch {
-  local sha="$(\git rev-parse HEAD)"
+  local sha="$($(type -P git) rev-parse HEAD)"
 
-  local nm_heads="$(\git show-ref --heads | grep ^$sha | cut -d/ -f3- | xargs -- | sed 's# #,#g')"
-  local nm_tags="$(\git show-ref --tags | grep ^$sha | cut -d/ -f3- | xargs -- | sed 's# #,#g')"
+  local nm_heads="$($(type -P git) show-ref --heads | grep ^$sha | cut -d/ -f3- | xargs -- | sed 's# #,#g')"
+  local nm_tags="$($(type -P git) show-ref --tags | grep ^$sha | cut -d/ -f3- | xargs -- | sed 's# #,#g')"
 
   local nm_branch=""
   if [[ -n "$nm_heads" ]]; then
@@ -36,7 +36,7 @@ function git_branch {
 
 function git_status {
   local gitstat=$(mktemp -t XXXXXX)
-  \git status --ignore-submodules=dirty 2>/dev/null > $gitstat
+  $(type -P git) status --ignore-submodules=dirty 2>/dev/null > $gitstat
  
   if [[ $(grep -c "# Your branch is ahead" $gitstat) > 0 ]]; then
     echo -n "^"
