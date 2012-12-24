@@ -1,2 +1,0 @@
-jekyll: bundle exec jekyll --auto --pygments --redcarpet --server $PORT
-compass: bundle exec compass watch theme

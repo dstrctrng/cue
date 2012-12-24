@@ -1,3 +1,0 @@
-guard 'jekyll' do
-  watch(/(.*)/)
-end
