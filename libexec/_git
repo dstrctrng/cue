@@ -28,9 +28,19 @@ function git_branch {
   fi
 
   if [[ -n "$nm_tags" ]]; then
+    # on a tag
     nm_branch="$nm_branch${scomment}<${syellow}$nm_tags${scomment}>"
   else
-    if [[ -z "$nm_heads" ]]; then
+    if [[ -n "$nm_heads" ]]; then
+      # on a branch, untagged
+      local last_tag="$(gut log --oneline --decorate | perl -ne 'map { print join(" ",m{tag:\s+([^,\)]+)}g), "\n" } (m{ ^[0-9a-f]{7}\s+ (\([^)]+)}xg)' | egrep -v '^\s*$' | head -1 | awk '{print $1}')"
+      if [[ -n "$last_tag" ]]; then
+        # found the closest tag
+        local num_commits="$(gut log $last_tag..HEAD | grep ^commit | wc -l | awk '{print $1}')"
+        nm_branch="$nm_branch${scomment}<${syellow}${last_tag}${scomment}/${sorange}${num_commits}${scomment}>"
+      fi
+    else
+      # not on a branch
       nm_branch="$nm_branch${scomment}<${sorange}$sha${scomment}>"
     fi
   fi
