@@ -103,6 +103,11 @@ function git_status {
 }
 
 function prompt_git {
+  # git parent?
+  if ! $(type -P git) rev-parse HEAD >/dev/null 2>&1; then
+    return 0
+  fi
+
   # optional git
   local tmp_project="$(mktemp -t XXXXXXXXX)"
   local tmp_status="$(mktemp -t XXXXXXXXX)"
@@ -115,7 +120,7 @@ function prompt_git {
   local nm_project="$(cat $tmp_project)"
   local gstatus="$(cat $tmp_status)"
   local nm_branch="$(cat $tmp_branch)"
-  rm -f $tmp_project $tmp_status
+  rm -f $tmp_project $tmp_status $tmp_branch
 
   if [[ -n $nm_project ]]; then
     local clr_gstatus="${scomment}"
