@@ -62,6 +62,15 @@ function prompt_filler {
 function prompt {
   local RETVAL="$?"
 
+  local prompts="$(echo "${PS1_LEFT}${PS1_RIGHT}" | perl -ne 'map { print "$_\n" } m{\$\{prn_(\w+)\}}g' | sort -u)"
+
+  local p
+  for p in $prompts error shell jobs root cli; do
+    local fn_prn="prompt_${p}"
+    local nm_prn="prn_${p}"
+    eval "$nm_prn=\$($fn_prn)"
+  done
+
   if [[ -n "${DISPLAY:-}" ]]; then
     if [[ "$UID" = 0 ]]; then
       slight
@@ -69,15 +78,6 @@ function prompt {
       sdark
     fi
   fi
-
-  local prompts="$(echo "${PS1_LEFT}${PS1_RIGHT}" | perl -ne 'map { print "$_\n" } m{\$\{prn_(\w+)\}}g' | sort -u)"
-
-  local p
-  for p in $prompts error jobs shell root cli; do
-    local fn_prn="prompt_${p}"
-    local nm_prn="prn_${p}"
-    eval "$nm_prn=\$($fn_prn)"
-  done
 
   local prn_filler="$(prompt_filler "$(eval echo "${PS1_START}${PS1_LEFT}${PS1_RIGHT}${PS1_END}")")"
 
