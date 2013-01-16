@@ -19,9 +19,17 @@ function prompt_ssh {
     export LC_ORIGIN="$hst_this${txt_origin}"
   fi
 
-  if [[ -n ${LC_ORIGIN:-} && $LC_ORIGIN != "$hst_this" ]]; then
-    echo " ${shigh}$LOGNAME@$hst_this${scomment}${txt_origin}"
+  local nm_user="$LOGNAME"
+
+  if [[ "$nm_user" = "root" ]]; then
+    nm_user="${sorange}${nm_user}"
   else
-    echo " ${shigh}$LOGNAME@$hst_this"
+    nm_user="${shigh}${nm_user}"
+  fi
+
+  if [[ -n ${LC_ORIGIN:-} && $LC_ORIGIN != "$hst_this" ]]; then
+    echo " ${nm_user}${shigh}@$hst_this${scomment}${txt_origin}"
+  else
+    echo " ${nm_user}${shigh}@$hst_this"
   fi
 }
