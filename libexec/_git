@@ -13,10 +13,8 @@ function git_project {
 }
 
 function git_branch {
-  local sha="$(gut rev-parse HEAD)"
-
-  local nm_heads="$(gut show-ref --heads | grep ^$sha | cut -d/ -f3- | xargs -- | sed 's# #,#g')"
-  local nm_tags="$(gut show-ref --tags | grep ^$sha | cut -d/ -f3- | xargs -- | sed 's# #,#g')"
+  local nm_heads="$(gut symbolic-ref HEAD 2> /dev/null)"
+  nm_heads="${nm_heads/refs\/heads\//}"
 
   local nm_branch=""
   if [[ -n "$nm_heads" ]]; then
@@ -26,6 +24,9 @@ function git_branch {
       nm_branch="${shigh}$nm_heads"
     fi
   fi
+
+  local sha="$(gut rev-parse HEAD)"
+  local nm_tags="$(gut show-ref --tags | grep ^$sha | cut -d/ -f3- | xargs -- | sed 's# #,#g')"
 
   if [[ -n "$nm_tags" ]]; then
     # on a tag
@@ -41,6 +42,7 @@ function git_branch {
       fi
     else
       # not on a branch
+      sha="$(gut show-ref --head -s --abbrev | head -n1 2> /dev/null)"
       nm_branch="$nm_branch${scomment}<${sorange}$sha${scomment}>"
     fi
   fi
