@@ -14,4 +14,5 @@ source "$CUE/libexec/_prompt"
 : ${PS1_START:='--'}
 : ${PS1_LEFT:='${prn_pwd}'}
 : ${PS1_RIGHT:='${prn_ssh}'}
-: ${PS1_END:=' --'}
+: ${PS1_END:='${scomment}--'}
+: ${PS1_BREAK:='${PS1_START}'}

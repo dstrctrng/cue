@@ -37,6 +37,10 @@ function prompt_root {
   fi
 }
 
+function prompt_cli {
+  echo -n "${shigh}"
+}
+
 function prompt_filler {
   local prn_prompt="$1"; shift
   # filler
@@ -55,10 +59,6 @@ function prompt_filler {
   fi
 }
 
-function prompt_cli {
-  echo -n "${shigh}"
-}
-
 function prompt {
   local RETVAL="$?"
 
@@ -66,16 +66,19 @@ function prompt {
 
   local p
   for p in $prompts error jobs shell root cli; do
-    fn_prn="prompt_${p}"
-    nm_prn="prn_${p}"
+    local fn_prn="prompt_${p}"
+    local nm_prn="prn_${p}"
     eval "$nm_prn=\$($fn_prn)"
   done
 
-  prn_filler="$(prompt_filler "$(eval echo "${PS1_START}${PS1_LEFT}${PS1_RIGHT}${PS1_END}")")"
+  local prn_filler="$(prompt_filler "$(eval echo "${PS1_START}${PS1_LEFT}${PS1_RIGHT}${PS1_END}")")"
+
+  # TODO eval echo "xxx" where xxx ends in space, gets rtrimmed
+  # TODO also that newline before the PS1_BREAK, same as ^^
+  PS1="${scomment}$(eval echo "${PS1_START}${PS1_LEFT}")${prn_filler}$(eval echo "${PS1_RIGHT}")$(eval echo "${PS1_END}")
+$(eval echo "${PS1_BREAK}") ${prn_error}${prn_jobs}${prn_shell}${prn_root}${prn_cli}"
 
   PS2="${shigh} > "
-  PS1="${scomment}$(eval echo "${PS1_START}${PS1_LEFT}")${prn_filler}$(eval echo "${PS1_RIGHT}")${scomment}$(eval echo "${PS1_END}")${shigh}
--- ${prn_error}${prn_jobs}${prn_shell}${prn_root}${prn_cli}"
 }
 
 PROMPT_COMMAND=prompt
