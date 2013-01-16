@@ -62,6 +62,14 @@ function prompt_filler {
 function prompt {
   local RETVAL="$?"
 
+  if [[ -n "${DISPLAY:-}" ]]; then
+    if [[ "$UID" = 0 ]]; then
+      slight
+    else
+      sdark
+    fi
+  fi
+
   local prompts="$(echo "${PS1_LEFT}${PS1_RIGHT}" | perl -ne 'map { print "$_\n" } m{\$\{prn_(\w+)\}}g' | sort -u)"
 
   local p
