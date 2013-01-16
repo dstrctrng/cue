@@ -1,0 +1,8 @@
+#!/bin/bash
+
+function default_theme {
+  PS1="${scomment}$(eval echo "${PS1_START}${PS1_LEFT}")${prn_filler}$(eval echo "${PS1_RIGHT}")$(eval echo "${PS1_END}")
+$(eval echo "${PS1_BREAK}") ${prn_error}${prn_jobs}${prn_shell}${prn_root}${prn_cli}"
+
+  PS2="${shigh} > "
+}

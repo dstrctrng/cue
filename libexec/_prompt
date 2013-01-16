@@ -59,18 +59,20 @@ function prompt_filler {
   fi
 }
 
-function prompt {
-  local RETVAL="$?"
-
+function eval_prompts {
   local prompts="$(echo "${PS1_LEFT}${PS1_RIGHT}" | perl -ne 'map { print "$_\n" } m{\$\{prn_(\w+)\}}g' | sort -u)"
 
   local p
-  for p in $prompts error shell jobs root cli; do
+  for p in $prompts "$@"; do
     local fn_prn="prompt_${p}"
     local nm_prn="prn_${p}"
     eval "$nm_prn=\$($fn_prn)"
   done
 
+  prn_filler="$(prompt_filler "$(eval echo "${PS1_START}${PS1_LEFT}${PS1_RIGHT}${PS1_END}")")"
+}
+
+function switch_palettes {
   if [[ -n "${DISPLAY:-}" ]]; then
     if [[ "$UID" = 0 ]]; then
       slight
@@ -78,17 +80,33 @@ function prompt {
       sdark
     fi
   fi
-
-  local prn_filler="$(prompt_filler "$(eval echo "${PS1_START}${PS1_LEFT}${PS1_RIGHT}${PS1_END}")")"
-
-  # TODO eval echo "xxx" where xxx ends in space, gets rtrimmed
-  # TODO also that newline before the PS1_BREAK, same as ^^
-  PS1="${scomment}$(eval echo "${PS1_START}${PS1_LEFT}")${prn_filler}$(eval echo "${PS1_RIGHT}")$(eval echo "${PS1_END}")
-$(eval echo "${PS1_BREAK}") ${prn_error}${prn_jobs}${prn_shell}${prn_root}${prn_cli}"
-
-  PS2="${shigh} > "
 }
 
-PROMPT_COMMAND=prompt
+function prompt {
+  local RETVAL="$?"
+
+  : ${PS1_LEFT:='${prn_pwd}'}
+  : ${PS1_RIGHT:='${prn_ssh}'}
+  : ${PS1_START:='--'}
+  : ${PS1_END:='${scomment}--'}
+  : ${PS1_BREAK:='${PS1_START}'}
+
+  eval_prompts error shell jobs root cli
+  switch_palettes
+
+  if [[ "$#" = 0 ]]; then
+    set -- default
+  fi
+
+  local nm_theme="$1"; shift
+
+  "$nm_theme"_theme "$@"
+}
+
+if [[ "$#" = 0 ]]; then
+  set -- default
+fi
+
+PROMPT_COMMAND="prompt $@"
 
 # vim: ts=2 sw=2 et
