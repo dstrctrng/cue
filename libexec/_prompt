@@ -17,7 +17,15 @@ function prompt_error {
   # optional error
   local err_last="$?"
   if [[ -n $err_last && $err_last != 0 ]]; then
-    echo -n "${sorange}[${sred}$err_last${sorange}]${shigh}"
+    echo -n "${sorange}[${sred}$err_last${sorange}]"
+  fi
+}
+
+function prompt_jobs {
+  # optional background jobs
+  local bg_jobs="$(jobs -l | wc -l)"
+  if [[ $bg_jobs > 0 ]]; then
+    echo -n "${sorange}[${syellow}$bg_jobs${sorange}]"
   fi
 }
 
@@ -41,6 +49,7 @@ function prompt_filler {
 
 function prompt {
   prn_error="$(prompt_error)"
+  prn_jobs="$(prompt_jobs)"
 
   local prompts="$(echo "${PS1_LEFT}${PS1_RIGHT}" | perl -ne 'map { print "$_\n" } m{\$\{prn_(\w+)\}}g' | sort -u)"
 
@@ -55,7 +64,7 @@ function prompt {
 
   PS2="${shigh} > "
   PS1="${scomment}$(eval echo "${PS1_START}${PS1_LEFT}")${prn_filler}$(eval echo "${PS1_RIGHT}")${scomment}$(eval echo "${PS1_END}")${shigh}
--- ${prn_shell}${prn_error}${scomment}:${shigh}\$HISTCMD ${shigh}=> ${shigh}"
+-- ${prn_shell}${prn_error}${prn_jobs}${scomment}:${shigh}\$HISTCMDe${shigh}=> ${shigh}"
 }
 
 PROMPT_COMMAND=prompt
