@@ -25,7 +25,7 @@ function prompt_jobs {
   # optional background jobs
   local bg_jobs="$(jobs -l | wc -l)"
   if [[ $bg_jobs > 0 ]]; then
-    echo -n "${sorange}[${syellow}$bg_jobs${sorange}]{$scomment}:"
+    echo -n "${sorange}[${syellow}$bg_jobs${sorange}]${scomment}:"
   fi
 }
 
