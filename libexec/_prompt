@@ -3,21 +3,21 @@
 function prompt_shell {
   : ${SHLVL_INITIAL:=$SHLVL}
   if [[ "${SHLVL}" = "${SHLVL_INITIAL}" ]]; then
-    echo ""
+    echo "${shigh}\$HISTCMD "
   else
     if [[ -n "${SHLVL_NAME:-}" ]]; then
-      echo "${scomment}[${scyan}$SHLVL_NAME${scomment}]"
+      echo "${scyan}$SHLVL_NAME${scomment}/${shigh}\$HISTCMD "
     else
-      echo "<$(( SHLVL - SHLVL_INITIAL ))>"
+      echo "${scyan}$(( SHLVL - SHLVL_INITIAL ))${scomment}/${shigh}\$HISTCMD "
     fi
   fi
 }
 
 function prompt_error {
   # optional error
-  local err_last="$?"
+  local err_last="$RETVAL"
   if [[ -n $err_last && $err_last != 0 ]]; then
-    echo -n "${sorange}[${sred}$err_last${sorange}]"
+    echo -n "${sorange}[${sred}$err_last${sorange}]${scomment}:"
   fi
 }
 
@@ -25,7 +25,15 @@ function prompt_jobs {
   # optional background jobs
   local bg_jobs="$(jobs -l | wc -l)"
   if [[ $bg_jobs > 0 ]]; then
-    echo -n "${sorange}[${syellow}$bg_jobs${sorange}]"
+    echo -n "${sorange}[${syellow}$bg_jobs${sorange}]{$scomment}:"
+  fi
+}
+
+function prompt_root {
+  if [[ $UID = 0 ]]; then
+    echo -n "${sorange}>>> "
+  else
+    echo -n "${shigh}=> "
   fi
 }
 
@@ -47,14 +55,17 @@ function prompt_filler {
   fi
 }
 
+function prompt_cli {
+  echo -n "${shigh}"
+}
+
 function prompt {
-  prn_error="$(prompt_error)"
-  prn_jobs="$(prompt_jobs)"
+  local RETVAL="$?"
 
   local prompts="$(echo "${PS1_LEFT}${PS1_RIGHT}" | perl -ne 'map { print "$_\n" } m{\$\{prn_(\w+)\}}g' | sort -u)"
 
   local p
-  for p in $prompts shell; do
+  for p in $prompts error jobs shell root cli; do
     fn_prn="prompt_${p}"
     nm_prn="prn_${p}"
     eval "$nm_prn=\$($fn_prn)"
@@ -64,7 +75,7 @@ function prompt {
 
   PS2="${shigh} > "
   PS1="${scomment}$(eval echo "${PS1_START}${PS1_LEFT}")${prn_filler}$(eval echo "${PS1_RIGHT}")${scomment}$(eval echo "${PS1_END}")${shigh}
--- ${prn_shell}${prn_error}${prn_jobs}${scomment}:${shigh}\$HISTCMDe${shigh}=> ${shigh}"
+-- ${prn_error}${prn_jobs}${prn_shell}${prn_root}${prn_cli}"
 }
 
 PROMPT_COMMAND=prompt
