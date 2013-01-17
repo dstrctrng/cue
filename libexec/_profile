@@ -10,5 +10,11 @@ source "$CUE/libexec/_nim"
 source "$CUE/libexec/_bindings"
 source "$CUE/libexec/_solarized"
 
-source "$CUE/libexec/_theme_default"
-source "$CUE/libexec/_prompt" default_theme
+if [[ "$#" = 0 ]]; then
+  set -- default
+fi
+
+__nm_theme="$1"; shift
+
+source "$CUE/libexec/_theme_${__nm_theme}"
+source "$CUE/libexec/_prompt" ${__nm_theme}_theme
