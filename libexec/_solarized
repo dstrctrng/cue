@@ -115,36 +115,37 @@ xred='#dc322f'
 xviolet='#6c71c4'
 xyellow='#b58900'
 
-: ${sscheme:=dark}
-export sscheme
-
 cmd_xc="$(which xtermcontrol 2>&-)"
 
 function sdark {
-  sbg="$sdbg"
-  sm="$sdm"
-  stext="$sdtext"
-  scomment="$sdcomment"
-  shigh="$sdhigh"
-  if [[ -n "$DISPLAY" && "${TERM%%-*}" = "xterm" && -x "$cmd_xc" ]]; then
-    "$cmd_xc" --bg "$xbase03"
+  if [[ "${sscheme:-}" != "dark" ]]; then
+    sbg="$sdbg"
+    sm="$sdm"
+    stext="$sdtext"
+    scomment="$sdcomment"
+    shigh="$sdhigh"
+    if [[ -n "$DISPLAY" && "${TERM%%-*}" = "xterm" && -x "$cmd_xc" ]]; then
+      "$cmd_xc" --bg "$xbase03"
+    fi
+    sscheme="dark"
   fi
-  sscheme="dark"
 }
 
 function slight {
-  sbg="$slbg"
-  sm="$slm"
-  stext="$sltext"
-  scomment="$slcomment"
-  shigh="$slhigh"
-  if [[ -n "$DISPLAY" && "${TERM%%-*}" = "xterm" && -x "$cmd_xc" ]]; then
-    "$cmd_xc" --bg "$xbase3"
+  if [[ "${sscheme:-}" != "light" ]]; then
+    sbg="$slbg"
+    sm="$slm"
+    stext="$sltext"
+    scomment="$slcomment"
+    shigh="$slhigh"
+    if [[ -n "$DISPLAY" && "${TERM%%-*}" = "xterm" && -x "$cmd_xc" ]]; then
+      "$cmd_xc" --bg "$xbase3"
+    fi
+    sscheme="light"
   fi
-  sscheme="light"
 }
 
-if [[ "$sscheme" = "dark" ]]; then
+if [[ -z "${sscheme:-}" ]]; then
   sdark
 else
   slight
