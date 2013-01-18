@@ -1,5 +1,16 @@
 #!/bin/bash
 
+require 'cue/pwd'
+require 'cue/ssh'
+require 'cue/git'
+
+: ${PS1_LEFT:='${prn_git}${prn_pwd}'}
+: ${PS1_RIGHT:='${prn_ssh}'}
+
+: ${PS1_START:='--'}
+: ${PS1_END:='${scomment}--'}
+: ${PS1_BREAK:='${PS1_START}'}
+
 function default_theme {
   PS1="${scomment}$(eval echo "${PS1_START}${PS1_LEFT}")${prn_filler}$(eval echo "${PS1_RIGHT}")$(eval echo "${PS1_END}")
 $(eval echo "${PS1_BREAK}") ${prn_error}${prn_jobs}${prn_shell}${prn_root}${prn_cli}"
