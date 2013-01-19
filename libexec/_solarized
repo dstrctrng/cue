@@ -145,8 +145,4 @@ function slight {
   fi
 }
 
-if [[ -z "${sscheme:-}" ]]; then
-  sdark
-else
-  slight
-fi
+sdark

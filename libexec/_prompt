@@ -33,12 +33,12 @@ function prompt_root {
   if [[ $UID = 0 ]]; then
     echo -n "${sorange}>>> "
     if [[ -n "${DISPLAY:-}" ]]; then
-      slight
+      true # slight
     fi
   else
     echo -n "${shigh}=> "
     if [[ -n "${DISPLAY:-}" ]]; then
-      sdark
+      true # sdark
     fi
   fi
 }
