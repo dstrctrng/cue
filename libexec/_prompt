@@ -1,7 +1,6 @@
 #!/bin/bash
 
 function prompt_shell {
-  : ${SHLVL_INITIAL:=$SHLVL}
   if [[ "${SHLVL}" = "${SHLVL_INITIAL}" ]]; then
     echo "${shigh}\$HISTCMD "
   else
@@ -32,14 +31,8 @@ function prompt_jobs {
 function prompt_root {
   if [[ $UID = 0 ]]; then
     echo -n "${sorange}>>> "
-    if [[ -n "${DISPLAY:-}" ]]; then
-      true # slight
-    fi
   else
     echo -n "${shigh}=> "
-    if [[ -n "${DISPLAY:-}" ]]; then
-      true # sdark
-    fi
   fi
 }
 
@@ -66,22 +59,36 @@ function prompt_filler {
 }
 
 function eval_prompts {
-  local prompts="$(echo "${PS1_LEFT}${PS1_RIGHT}" | perl -ne 'map { print "$_\n" } m{\$\{prn_(\w+)\}}g' | sort -u)"
-
   local p
-  for p in "$@" $prompts; do
+  for p in "$@"; do
     local fn_prn="prompt_${p}"
     local nm_prn="prn_${p}"
     eval "$nm_prn=\$($fn_prn)"
   done
-
-  prn_filler="$(prompt_filler "$(eval echo "${PS1_START}${PS1_LEFT}${PS1_RIGHT}${PS1_END}")")"
 }
 
 function prompt {
   local RETVAL="$?"
 
-  eval_prompts jobs root error shell cli
+  eval_prompts jobs root
+
+  if [[ -n "${DISPLAY:-}" ]]; then
+    if [[ $UID = 0 ]]; then
+      slight light
+    else
+      sdark dark
+    fi
+  fi
+
+  eval_prompts error shell cli
+
+  if [[ -z ${COLUMNS:-} ]]; then
+    eval_prompts $(echo "${PS1_LEFT}" | perl -ne 'map { print "$_\n" } m{\$\{prn_(\w+)\}}g' | sort -u)
+    local prn_filler=""
+  else
+    eval_prompts $(echo "${PS1_LEFT}${PS1_RIGHT}" | perl -ne 'map { print "$_\n" } m{\$\{prn_(\w+)\}}g' | sort -u)
+    local prn_filler="$(prompt_filler "$(eval echo "${PS1_START}${PS1_LEFT}${PS1_RIGHT}${PS1_END}")")"
+  fi
 
   "$@"
 }

@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # taken from http://ethanschoonover.com/solarized
 #
 # SOLARIZED HEX     16/8 TERMCOL  XTERM/HEX   L*A*B      RGB         HSB
@@ -48,10 +50,6 @@
 # yellow      0;33     base00        1;33
 # base2       0;37     base3         1;37
 
-#!/bin/bash
-
-_esc="$(perl -e 'printf "%c", 27')"
-
 function _ansi {
   echo -n "\[\e[${1}m\]"
 }
@@ -99,7 +97,7 @@ syellow="$(_ansi "$_syellow")"
 xbase00='#657b83'
 xbase01='#586e75'
 xbase02='#073642'
-xbase03='#002b36'
+xbase03='rgb:0000/2b2b/3636' # '#002b36'
 
 xbase0='#839496'
 xbase1='#93a1a1'
@@ -118,31 +116,40 @@ xyellow='#b58900'
 cmd_xc="$(which xtermcontrol 2>&-)"
 
 function sdark {
-  if [[ "${sscheme:-}" != "dark" ]]; then
-    sbg="$sdbg"
-    sm="$sdm"
-    stext="$sdtext"
-    scomment="$sdcomment"
-    shigh="$sdhigh"
+  export sbg="$sdbg"
+  export sm="$sdm"
+  export stext="$sdtext"
+  export scomment="$sdcomment"
+  export shigh="$sdhigh"
+  if [[ -z "${sscheme:-}" || "${sscheme:-}" != "${1:-}" ]]; then
     if [[ -n "$DISPLAY" && "${TERM%%-*}" = "xterm" && -x "$cmd_xc" ]]; then
-      "$cmd_xc" --bg "$xbase03"
+      "$cmd_xc" --bg "$xbase03" --fg "$xbase0"
+      if [[ -n "${1:-}" ]]; then
+        export sscheme="$1"
+      fi
     fi
-    sscheme="dark"
+  elif [[ "${sscheme:-}" = "${1:-}" ]]; then
+    if [[ -n "$DISPLAY" && "${TERM%%-*}" = "xterm" && -x "$cmd_xc" ]]; then
+      local xc_bg="$("$cmd_xc" --get-bg)"
+      if [[ "$xc_bg" != "$xbase03" ]]; then
+        "$cmd_xc" --bg "$xbase03" --fg "$xbase0"
+      fi
+    fi
   fi
 }
 
 function slight {
-  if [[ "${sscheme:-}" != "light" ]]; then
-    sbg="$slbg"
-    sm="$slm"
-    stext="$sltext"
-    scomment="$slcomment"
-    shigh="$slhigh"
+  export sbg="$slbg"
+  export sm="$slm"
+  export stext="$sltext"
+  export scomment="$slcomment"
+  export shigh="$slhigh"
+  if [[ -z "${sscheme:-}" || "${sscheme:-}" != "${1:-}" ]]; then
     if [[ -n "$DISPLAY" && "${TERM%%-*}" = "xterm" && -x "$cmd_xc" ]]; then
-      "$cmd_xc" --bg "$xbase3"
+      "$cmd_xc" --bg "$xbase3" --fg "$xbase00"
+      if [[ -n "${1:-}" ]]; then
+        export sscheme="$1"
+      fi
     fi
-    sscheme="light"
   fi
 }
-
-sdark

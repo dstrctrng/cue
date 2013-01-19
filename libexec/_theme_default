@@ -12,8 +12,13 @@ require 'cue/git'
 : ${PS1_BREAK:='${PS1_START}'}
 
 function default_theme {
-  PS1="${scomment}$(eval echo "${PS1_START}${PS1_LEFT}")${prn_filler}$(eval echo "${PS1_RIGHT}")$(eval echo "${PS1_END}")
+  if [[ -n "$prn_filler" ]]; then
+    PS1="${scomment}$(eval echo "${PS1_START}${PS1_LEFT}")${prn_filler}$(eval echo "${PS1_RIGHT}")$(eval echo "${PS1_END}")
 $(eval echo "${PS1_BREAK}") ${prn_error}${prn_jobs}${prn_shell}${prn_root}${prn_cli}"
+  else
+    PS1="${scomment}$(eval echo "${PS1_START}${PS1_LEFT}")
+$(eval echo "${PS1_BREAK}") ${prn_error}${prn_jobs}${prn_shell}${prn_root}${prn_cli}"
+  fi
 
   PS2="${shigh} > "
 }
