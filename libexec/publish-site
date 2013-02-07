@@ -1,0 +1,81 @@
+#!/bin/bash
+
+#/ NAME
+#/     publish-site -- commit files from one dir to a repo/branch/dir
+#/
+#/ SYNOPSIS
+#/     publish site src_dir repo branch dst_dir
+#/     publish site # defaults to output . gh-pages .
+
+# figure out the project root under which bin, lib live
+shome="$(cd -P -- "$(dirname -- "$BASH_SOURCE")/.." && pwd -P)"
+
+# load a jason bourne library
+source "$shome/libexec/_jason"
+
+# define command line options:
+DEFINE_boolean "clean" "$FLAGS_FALSE" "delete destination branch contents"
+DEFINE_string "message" "published $(date)" "commit message for published content" "m"
+
+# entry point
+function main {
+  set -x
+
+  if [[ "$#" = 0 ]]; then
+    local src_dir="output"
+  else
+    local src_dir="$1"; shift
+  fi
+
+  if [[ "$#" = 0 ]]; then
+    local dst_repo="."
+  else
+    local dst_repo="$1"; shift
+  fi
+
+  if [[ "$#" = 0 ]]; then
+    local dst_branch="gh-pages"
+  else
+    local dst_branch="$1"; shift
+  fi
+
+  if [[ "$#" = 0 ]]; then
+    local dst_dir="."
+  else
+    local dst_dir="$1"; shift
+  fi
+
+  local tmp_dir="$(TMPDIR="$shome/tmp" mktemp -d -t XXXXXXXXX)"
+
+  git clone "$dst_repo" "$tmp_dir"
+
+  pushd "$tmp_dir" > /dev/null
+  if ! git checkout "$dst_branch"; then
+    # basically git disconnect from paul repo
+    git checkout --orphan "$dst_branch"
+    git rm -rf .
+    touch .gitignore
+    git add .gitignore
+    git commit -m "initializing disconnected branch $dst_branch"
+    git clean -fdx
+  fi
+
+  if [[ "$FLAGS_clean" = "$FLAGS_TRUE" ]]; then
+    git rm -rf .
+    git add -u .
+  fi
+  popd > /dev/null
+
+  rsync -q -ia -c -O "$src_dir/." "$tmp_dir/$dst_dir"
+
+  pushd "$tmp_dir" > /dev/null
+  git add .
+  git status -s
+  git commit -m "$FLAGS_message"
+  git push origin "$dst_branch"
+  popd > /dev/null
+
+  rm -rf "$tmp_dir"
+}
+
+require sub "$BASH_SOURCE" "$@"

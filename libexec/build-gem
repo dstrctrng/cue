@@ -1,0 +1,30 @@
+#!/bin/bash
+
+#/ NAME
+#/     build-gem -- upload the latest (timestamp) rubygem to rubygems.org
+#/
+#/ SYNOPSIS
+#/     build gem -n gem_name
+
+# figure out the project root under which bin, lib live
+shome="$(cd -P -- "$(dirname -- "$BASH_SOURCE")/.." && pwd -P)"
+
+# load a jason bourne library
+source "$shome/libexec/_jason"
+
+# define command line options:
+DEFINE_string 'name' "$(basename "$shome")" 'name of gem' 'n'
+
+# entry point
+function main {
+  local pth_gemspec="$shome/$FLAGS_name.gemspec"
+  if [[ ! -e "$pth_gemspec" ]]; then
+    logger_fatal "could not find gemspec $pth_gemspec"
+    exit 1
+  fi
+
+  cd "$shome"
+  gem build "$pth_gemspec"
+}
+
+require sub "$BASH_SOURCE" "$@"

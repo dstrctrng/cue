@@ -1,6 +1,22 @@
 #!/bin/bash
 
-if [[ "${BASH_SOURCE##*/}" = "_sub" ]]; then
+if [[ "${BASH_SOURCE##*/}" != "_sub" ]]; then
+  shome="$(cd -P -- "$(dirname -- "$BASH_SOURCE")/.." && pwd -P)"
+  source "$shome/libexec/_jason"
+  set -- "$BASH_SOURCE" "$@"
+fi
+
+if [[ "$(type -t main)" != "function" ]]; then
+function main {
+  if [[ "$#" > 0 ]]; then
+    logger_fatal "Command $sub_base $1 not implemented"
+  else
+    logger_fatal "Command $sub_base not implemented"
+  fi
+  exit 1
+}
+fi
+
 function sub {
   local bsource="$1"; shift
   local sub_base="$(basename "$bsource")"
@@ -29,15 +45,15 @@ function sub {
   if [[ -x "$bsource_cmd" && "$bsource_cmd" != "$bsource" ]]; then
     exec "$bsource_cmd" "$@"
   else
-    main "$@"
+    if [[ "$(type -t main)" = "function" ]]; then
+      main "$@"
+    else
+      logger_fatal "Can't run $sub_base, missing main function"
+      exit 1
+    fi
   fi
 }
 
-  if [[ "$#" > 0 ]]; then
-    sub "$@"  
-  fi
-else
-  shome="$(cd -P -- "$(dirname -- "$BASH_SOURCE")/.." && pwd -P)"
-  source "$shome/libexec/_jason"
-  require 'sub' "$BASH_SOURCE" "$@"
+if [[ "$#" > 0 ]]; then
+  sub "$@"  
 fi

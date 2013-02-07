@@ -1,0 +1,58 @@
+#!/bin/bash
+
+#/ NAME
+#/     publish-gem -- publish a gem to a local, remote rubygems, geminabox repository
+#/
+#/ SYNOPSIS
+#/     publish gem [--public | --private | --local]
+
+# figure out the project root under which bin, lib live
+shome="$(cd -P -- "$(dirname -- "$BASH_SOURCE")/.." && pwd -P)"
+
+# load a jason bourne library
+source "$shome/libexec/_jason"
+
+# define command line options:
+DEFINE_boolean "private" "$FLAGS_TRUE" "push to a local, private geminabox"
+DEFINE_boolean "shared" "$FLAGS_FALSE" "push to a shared, private geminabox"
+DEFINE_boolean "public" "$FLAGS_FALSE" "push to rubygems.org"
+
+# entry point
+function main {
+  if [[ "$FLAGS_public" = "$FLAGS_TRUE" ]]; then
+    push_gem "$@"
+  elif [[ "$FLAGS_private" = "$FLAGS_TRUE" ]]; then
+    push_gem_private
+  else
+    logger_fatal "must specify --public to confirm a gem push to rubygems.org"
+    exit 1
+  fi
+}
+
+# push a gem locally 
+function push_gem_private {
+  if [[ "$#" = 0 ]]; then
+    set +f
+    local latest_gem="$(ls -td *.gem 2>&- | head -1)"
+    push_gem_private "$latest_gem"
+    set -f
+  else
+    gem inabox -g http://localhost:9292 "$@"
+  fi
+}
+
+# push the latest gem to rubygems.org
+function push_gem {
+  set +f
+  local latest_gem="$(ls -td *.gem 2>&- | head -1)"
+  set -f
+  
+  if [[ -z "$latest_gem" ]]; then
+    logger_fatal "no gems found"
+    exit 1
+  fi
+
+  gem push "$latest_gem"
+}
+
+require sub "$BASH_SOURCE" "$@"

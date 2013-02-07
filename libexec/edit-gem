@@ -1,0 +1,81 @@
+#!/bin/bash
+
+#/ NAME
+#/     edit-gem -- set environment to hint to Gemfile to use a local gemspec
+#/
+#/ SYNOPSIS
+#/     edit gem <name> [location]
+#/     edit gem -r <names>
+#/     edit gem -R
+
+# figure out the project root under which bin, lib live
+shome="$(cd -P -- "$(dirname -- "$BASH_SOURCE")/.." && pwd -P)"
+
+# load a jason bourne library
+source "$shome/libexec/_jason"
+
+# define command line options:
+DEFINE_boolean "update" "$FLAGS_FALSE" "finish editing a local gem and updates project" "u"
+DEFINE_boolean "reset" "$FLAGS_FALSE" "reset gem to remote" "r"
+DEFINE_boolean "resetall" "$FLAGS_FALSE" "reset all gems to remote" "R"
+
+# entry point
+function main {
+  if [[ "$FLAGS_resetall" = "$FLAGS_TRUE" ]]; then
+    set +f
+    rm -f $shome/.local/*
+    set -f
+    bundle --local --quiet && bundle check > /dev/null
+    git diff --no-ext-diff Gemfile.lock vendor/cache
+  elif [[ "$FLAGS_reset" = "$FLAGS_TRUE" ]]; then
+    local nm_gem
+    for nm_gem in "$@"; do
+      rm -f "$shome/.local/$nm_gem"
+    done
+
+    bundle --local --quiet && bundle check > /dev/null
+
+    git diff --no-ext-diff Gemfile.lock vendor/cache
+  elif [[ "$FLAGS_update" = "$FLAGS_TRUE" ]]; then
+    local nm_gem
+    for nm_gem in "$@"; do
+      echo -n > "$shome/.local/$nm_gem"
+    done
+
+    bundle update "$@"
+
+    for nm_gem in "$@"; do
+      rm -f "$shome/.local/$nm_gem"
+    done
+    bundle --local --quiet && bundle check > /dev/null
+
+    git add Gemfile.lock vendor/cache
+    git add -u vendor/cache
+    git diff --no-ext-diff --cached Gemfile.lock vendor/cache
+  else
+    local nm_gem="$1"; shift
+
+    local pth_gem
+    if [[ "$#" = 0 ]]; then
+      pth_gem="gems/$nm_gem"
+    else
+      pth_gem="$1"; shift
+    fi
+    
+    if [[ ! -d "$pth_gem" ]]; then
+      logger_fatal "cannot find local gem directoy at $pth_gem"
+      exit 1
+    fi
+
+    pth_gem="$(cd -P -- "$pth_gem" && pwd -P)"
+
+    echo "enabling local gem development on ${nm_gem} at ${pth_gem}"
+    mkdir -p "$shome/.local"
+    echo "$pth_gem" > "$shome/.local/$nm_gem"
+
+    bundle --local --quiet && bundle check > /dev/null
+    git diff --no-ext-diff Gemfile.lock vendor/cache
+  fi
+}
+
+require sub "$BASH_SOURCE" "$@"

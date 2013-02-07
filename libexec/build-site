@@ -1,0 +1,27 @@
+#!/bin/bash
+
+#/ NAME
+#/     build-site -- build nanoc site
+#/
+#/ SYNOPSIS
+#/     build site
+
+# figure out the project root under which bin, lib live
+shome="$(cd -P -- "$(dirname -- "$BASH_SOURCE")/.." && pwd -P)"
+
+# load a jason bourne library
+source "$shome/libexec/_jason"
+
+# define command line options:
+DEFINE_boolean 'clean' "$FLAGS_FALSE" 'delete output directory first'
+
+# entry point
+function main {
+  if [[ "$FLAGS_clean" = "$FLAGS_TRUE" ]]; then
+    rm -rf "$shome/output"
+  fi
+
+  bundle exec ghp compile
+}
+
+require sub "$BASH_SOURCE" "$@"
