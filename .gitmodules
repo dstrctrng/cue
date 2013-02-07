@@ -4,3 +4,6 @@
 [submodule ".irssi"]
 	path = .irssi
 	url = https://github.com/destructuring/irssi-colors-solarized.git
+[submodule "output"]
+	path = output
+	url = ./.
