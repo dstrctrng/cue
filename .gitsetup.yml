@@ -1,0 +1,5 @@
+---
+branch: gh-pages
+remotes:
+  primary: git@github.com:destructuring/cue
+  secondary: git@bitbucket.org:destructuring/cue
