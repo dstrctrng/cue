@@ -4,3 +4,4 @@
 *.orig
 /tmp
 /crash.log
+/output
