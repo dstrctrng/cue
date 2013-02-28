@@ -4,6 +4,12 @@ function gut {
   $(type -P git) "$@"
 }
 
+function git_upstream {
+  local nm_branch="$1"; shift
+
+  git for-each-ref --shell --format="%(upstream:short)" "refs/heads/$nm_branch" | cut -d"'" -f2 | cut -d/ -f2-
+}
+
 function git_project {
   local gitname=$(gut config remote.origin.name)
   if [[ -z $gitname ]]; then
@@ -22,6 +28,11 @@ function git_branch {
       nm_branch="${syellow}$nm_heads"
     else
       nm_branch="${shigh}$nm_heads"
+    fi
+
+    local nm_upstream="$(git_upstream "$nm_heads")"
+    if [[ "$nm_upstream" != "$nm_heads" ]]; then
+      nm_branch="${nm_branch}:${syellow}${nm_upstream}"
     fi
   fi
 
