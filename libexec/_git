@@ -32,7 +32,7 @@ function git_branch {
 
     local nm_upstream="$(git_upstream "$nm_heads")"
     if [[ "$nm_upstream" != "$nm_heads" ]]; then
-      nm_branch="${nm_branch}:${syellow}${nm_upstream}"
+      nm_branch="${nm_branch}=>${syellow}${nm_upstream}:"
     fi
   fi
 
