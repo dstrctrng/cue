@@ -1,8 +1,8 @@
 #!/bin/bash
 
-require 'cue/pwd'
-require 'cue/ssh'
-require 'cue/git'
+source "$CUE/libexec/_pwd"
+source "$CUE/libexec/_ssh"
+source "$CUE/libexec/_git"
 
 : ${PS1_LEFT:='${prn_git}${prn_pwd}'}
 : ${PS1_RIGHT:='${prn_ssh}'}
