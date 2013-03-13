@@ -74,9 +74,11 @@ function prompt {
 
   if [[ -n "${DISPLAY:-}" ]]; then
     if [[ $UID = 0 ]]; then
-      slight light
+      #slight light
+      true
     else
-      sdark dark
+      #sdark dark
+      true
     fi
   fi
 
