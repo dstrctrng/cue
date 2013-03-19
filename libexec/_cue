@@ -3,7 +3,7 @@
 if [[ "$#" > 0 ]]; then
   CUE="$1"; shift
 else
-  CUE="$(cd -P -- "$(dirname -- "${BASH_SOURCE}")/.." && pwd -P)"
+  CUE="$(unset CDPATH; cd -P -- "$(dirname -- "${BASH_SOURCE}")/.." && pwd -P)"
 fi  
 
 source "$CUE/libexec/_nim"
