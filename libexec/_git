@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function gut {
+function git_real {
   $(type -P git) "$@"
 }
 
@@ -11,15 +11,15 @@ function git_upstream {
 }
 
 function git_project {
-  local gitname=$(gut config remote.origin.name)
+  local gitname=$(git_real config remote.origin.name)
   if [[ -z $gitname ]]; then
-    gitname=$(basename $(gut config remote.origin.url) .git)
+    gitname=$(basename $(git_real config remote.origin.url) .git)
   fi
   echo "$gitname"
 }
 
 function git_branch {
-  local nm_heads="$(gut symbolic-ref HEAD 2> /dev/null)"
+  local nm_heads="$(git_real symbolic-ref HEAD 2> /dev/null)"
   nm_heads="${nm_heads/refs\/heads\//}"
 
   local nm_branch=""
@@ -36,8 +36,8 @@ function git_branch {
     fi
   fi
 
-  local sha="$(gut rev-parse HEAD)"
-  local nm_tags="$(gut show-ref --tags | grep ^$sha | cut -d/ -f3- | xargs -- | sed 's# #,#g')"
+  local sha="$(git_real rev-parse HEAD)"
+  local nm_tags="$(git_real show-ref --tags | grep ^$sha | cut -d/ -f3- | xargs -- | sed 's# #,#g')"
 
   if [[ -n "$nm_tags" ]]; then
     # on a tag
@@ -45,14 +45,14 @@ function git_branch {
   else
     if [[ -z "$nm_heads" ]]; then
       # no branch name, so get short sha
-      nm_branch="${syellow}$(gut show-ref --head -s --abbrev | head -n1 2> /dev/null)"
+      nm_branch="${syellow}$(git_real show-ref --head -s --abbrev | head -n1 2> /dev/null)"
     fi
 
     # on a branch, untagged
-    local last_tag="$(gut log --oneline --decorate | perl -ne 'map { print join(" ",m{tag:\s+([^,\)]+)}g), "\n" } (m{ ^[0-9a-f]{7}\s+ (\([^)]+)}xg)' | egrep -v '^\s*$' | head -1 | awk '{print $1}')"
+    local last_tag="$(git_real log --oneline --decorate | perl -ne 'map { print join(" ",m{tag:\s+([^,\)]+)}g), "\n" } (m{ ^[0-9a-f]{7}\s+ (\([^)]+)}xg)' | egrep -v '^\s*$' | head -1 | awk '{print $1}')"
     if [[ -n "$last_tag" ]]; then
       # found the closest tag
-      local num_commits="$(gut log $last_tag..HEAD | grep ^commit | wc -l | awk '{print $1}')"
+      local num_commits="$(git_real log $last_tag..HEAD | grep ^commit | wc -l | awk '{print $1}')"
       nm_branch="$nm_branch${scomment}<${syellow}${last_tag}${scomment}/${sorange}${num_commits}${scomment}>"
     fi
   fi
@@ -62,7 +62,7 @@ function git_branch {
 
 function git_status {
   local gitstat=$(mktemp -t XXXXXX)
-  gut status --ignore-submodules=dirty 2>/dev/null > $gitstat
+  git_real status --ignore-submodules=dirty 2>/dev/null > $gitstat
  
   if [[ $(grep -c "# Your branch is ahead" $gitstat) > 0 ]]; then
     echo -n "^"
