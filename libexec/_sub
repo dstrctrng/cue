@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [[ "${BASH_SOURCE##*/}" != "_sub" ]]; then
-  shome="$(cd -P -- "$(dirname -- "$BASH_SOURCE")/.." && pwd -P)"
+  shome="$(unset CDPATH; cd -P -- "$(dirname -- "$BASH_SOURCE")/.." && pwd -P)"
   source "$shome/libexec/_jason"
   set -- "$BASH_SOURCE" "$@"
 fi
@@ -30,9 +30,10 @@ function sub {
 
   if [[ "$#" > 0 ]]; then
     if [[ ! "$1" =~ ^- ]]; then
-      local sub_cmd="$(command -v "${sub_base}-$1" || true)"
+      local sub_cmd="$shome/libexec/${sub_base}-$1"
+      
       if [[ ! -x "$sub_cmd" ]]; then
-        sub_cmd="$shome/libexec/${sub_base}-$1"
+        sub_cmd="$(type -P "${sub_base}-$1" || true)"
       fi
 
       if [[ -x "$sub_cmd" ]]; then

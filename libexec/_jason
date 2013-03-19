@@ -7,17 +7,8 @@ fi
 __meat__='y'
 
 if [[ -z "${shome:-}" ]]; then
-  shome="$(cd -P -- "$(dirname -- "${BASH_SOURCE}")/.." && pwd -P)"
+  shome="$(unset CDPATH; cd -P -- "$(dirname -- "${BASH_SOURCE}")/.." && pwd -P)"
 fi
-
-function get_started {
-  # if getting-started bootstrap is detected, put this in the path
-  # mainly useful for getopt on os x
-  if [[ -d "$HOME/.getting-started/bootstrap" ]]; then
-    PATH="$HOME/.getting-started/bootstrap:$PATH"
-    hash -r
-  fi
-}
 
 function check_help {
   # taken from shocco
@@ -60,23 +51,15 @@ function display_synopsis {
 
 function which_library {
   local library="$1"; shift
-  if [[ -r "$shome/bin/_$library" ]]; then
-    echo "$shome/bin/_$library"
-  elif [[ -r "$shome/libexec/_$library" ]]; then
+  if [[ -r "$shome/libexec/_$library" ]]; then
     echo "$shome/libexec/_$library"
-  elif [[ -r "$shome/.$library/bin/_profile" ]]; then
-    echo "$shome/.$library/bin/_profile"
-  elif [[ -r "$shome/.$library/libexec/_profile" ]]; then
-    echo "$shome/.$library/libexec/_profile"
-  elif [[ -r "$shome/.$library/.profile" ]]; then
-    echo "$shome/.$library/.profile"
+  elif [[ -r "$shome/.$library/libexec/_$library" ]]; then
+    echo "$shome/.$library/libexec/_$library"
   else
     local nm_library="${library%%/*}"
     if [[ "$nm_library" != "$library" ]]; then
       local nm_right="${library##*/}"
-      if [[ -r "$shome/.$nm_library/bin/_$nm_right" ]]; then
-        echo "$shome/.$nm_library/bin/_$nm_right"
-      elif [[ -r "$shome/.$nm_library/libexec/_$nm_right" ]]; then
+      if [[ -r "$shome/.$nm_library/libexec/_$nm_right" ]]; then
         echo "$shome/.$nm_library/libexec/_$nm_right"
       fi
     fi
@@ -151,14 +134,12 @@ function runmany {
 
 function _main {
   if [[ -z "$shome" ]]; then
-    shome="$(cd -P -- "$(dirname -- "${BASH_SOURCE}")/.." && pwd -P)"
+    shome="$(unset CDPATH; cd -P -- "$(dirname -- "${BASH_SOURCE}")/.." && pwd -P)"
   fi
 
   require 'shflags'
 
   configure_logging
-  
-  PATH="$shome/bin:$PATH"
 }
 
 _main "$@"
