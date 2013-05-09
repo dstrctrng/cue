@@ -1,6 +1,6 @@
 [submodule ".solarized"]
 	path = .solarized
-	url = https://github.com/destructuring/solarized.git
+	url = git@github.com:destructuring/solarized.git
 [submodule ".irssi"]
 	path = .irssi
-	url = https://github.com/destructuring/irssi-colors-solarized.git
+	url = git@github.com:destructuring/irssi-colors-solarized.git
