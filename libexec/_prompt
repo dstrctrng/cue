@@ -42,10 +42,9 @@ function prompt_cli {
 
 function prompt_filler {
   local prn_prompt="$1"; shift
-  # filler
+
   if [[ -z ${COLUMNS:-} ]]; then
-    echo ""
-    return
+    COLUMNS="$(tput cols)"
   fi
 
   if [[ -n ${COLUMNS:-} ]]; then
