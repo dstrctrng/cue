@@ -43,9 +43,8 @@ function prompt_cli {
 function prompt_filler {
   local prn_prompt="$1"; shift
 
-  if [[ -z ${COLUMNS:-} ]]; then
-    COLUMNS="$(tput cols)"
-  fi
+  # override since this can be empty or the wrong size
+  COLUMNS="$(tput cols)"
 
   if [[ -n ${COLUMNS:-} ]]; then
     local len_prompt=$(echo -n "$prn_prompt" | perl -pe 's{\\\[\\e\[\d+;\d+m\\\]}{}g' | wc -c | tr -d " ")
