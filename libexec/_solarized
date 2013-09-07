@@ -113,7 +113,7 @@ xred='#dc322f'
 xviolet='#6c71c4'
 xyellow='#b58900'
 
-cmd_xc="$(which xtermcontrol 2>&-)"
+cmd_xc="$(which xtermset 2>&-)"
 
 function sdark {
   export sbg="$sdbg"
@@ -123,16 +123,16 @@ function sdark {
   export shigh="$sdhigh"
   if [[ -z "${sscheme:-}" || "${sscheme:-}" != "${1:-}" ]]; then
     if [[ -n "$DISPLAY" && "${TERM%%-*}" = "xterm" && -x "$cmd_xc" ]]; then
-      "$cmd_xc" --bg "$xbase03" --fg "$xbase0"
+      "$cmd_xc" -bg "$xbase03" -fg "$xbase0"
       if [[ -n "${1:-}" ]]; then
         export sscheme="$1"
       fi
     fi
   elif [[ "${sscheme:-}" = "${1:-}" ]]; then
     if [[ -n "$DISPLAY" && "${TERM%%-*}" = "xterm" && -x "$cmd_xc" ]]; then
-      local xc_bg="$("$cmd_xc" --get-bg)"
+      local xc_bg="$("$cmd_xc" -get-bg)"
       if [[ "$xc_bg" != "$xbase03" ]]; then
-        "$cmd_xc" --bg "$xbase03" --fg "$xbase0"
+        "$cmd_xc" -bg "$xbase03" -fg "$xbase0"
       fi
     fi
   fi
@@ -146,7 +146,7 @@ function slight {
   export shigh="$slhigh"
   if [[ -z "${sscheme:-}" || "${sscheme:-}" != "${1:-}" ]]; then
     if [[ -n "$DISPLAY" && "${TERM%%-*}" = "xterm" && -x "$cmd_xc" ]]; then
-      "$cmd_xc" --bg "$xbase3" --fg "$xbase00"
+      "$cmd_xc" -bg "$xbase3" -fg "$xbase00"
       if [[ -n "${1:-}" ]]; then
         export sscheme="$1"
       fi
