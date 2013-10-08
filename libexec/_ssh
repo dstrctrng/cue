@@ -6,15 +6,11 @@ function prompt_ssh {
   if [[ -f $HOME/.name ]]; then
     hst_this=$(cat $HOME/.name)
   else
-    hst_this=$(hostname | awk -F.  'BEGIN { OFS="."; } {$(NF-1)=""; $NF=""; print $0; }' | sed 's#[.]*$##')
-  fi
-
-  if [[ -z $hst_this ]]; then
     hst_this=$(hostname -s)
   fi
 
   local txt_origin
-  if [[ -n ${LC_ORIGIN:-} && -z $LC_FROM ]]; then
+  if [[ -n ${LC_ORIGIN:-} && $LC_ORIGIN != "$hst_this" ]]; then
     txt_origin="/$LC_ORIGIN"
     export LC_ORIGIN="$hst_this${txt_origin}"
   fi
