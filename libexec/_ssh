@@ -9,6 +9,8 @@ function prompt_ssh {
     hst_this=$(hostname -s)
   fi
 
+  export CUE_HOST="$hst_this"
+
   local txt_origin
   if [[ -n ${LC_ORIGIN:-} && $LC_ORIGIN != "$hst_this" ]]; then
     txt_origin="/$LC_ORIGIN"
