@@ -80,7 +80,7 @@ function prompt {
     fi
   fi
 
-  eval_prompts error shell cli
+  eval_prompts error shell cli aws
 
   if [[ -z ${COLUMNS:-} ]]; then
     eval_prompts $(echo "${PS1_LEFT}" | perl -ne 'map { print "$_\n" } m{\$\{prn_(\w+)\}}g' | sort -u)
