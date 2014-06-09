@@ -30,9 +30,9 @@ function prompt_jobs {
 
 function prompt_root {
   if [[ $UID = 0 ]]; then
-    echo -n "${sorange}>>> "
+    echo -n "${sorange}>>>"
   else
-    echo -n "${shigh}=> "
+    echo -n "${shigh}=>"
   fi
 }
 

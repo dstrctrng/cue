@@ -19,5 +19,7 @@ function aws_region {
 
 function prompt_aws {
   # aws profile + region
-  echo "$(aws_profile)$(aws_region)"
+  local _aws="$(aws_profile)$(aws_region)"
+  echo "${_aws:+ ${_aws}}"
+
 }

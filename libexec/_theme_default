@@ -5,21 +5,21 @@ source "$CUE/libexec/_ssh"
 source "$CUE/libexec/_git"
 source "$CUE/libexec/_aws"
 
-PS1_START='--'
+PS1_START='${scomment}--'
 PS1_LEFT='${prn_git}${prn_pwd}'
 PS1_RIGHT='${prn_ssh}'
 PS1_END='${scomment}--'
 PS1_BREAK='${prn_error}${prn_jobs}${prn_shell}${prn_root}${prn_cli}${prn_aws}'
 
 function default_theme {
-  PS1="${scomment}$(eval echo "${PS1_START}${PS1_LEFT}")"
+  PS1="$(eval echo "${PS1_START}${PS1_LEFT}")"
   if [[ -n "$prn_filler" ]]; then
     local prn_extra="${prn_filler}$(eval echo "${PS1_RIGHT}")$(eval echo "${PS1_END}")"
     PS1="${PS1}${prn_extra}"
   fi
 
   PS1="${PS1}
-$(eval echo "${PS1_START} ${PS1_BREAK}") "
+$(eval echo "${PS1_START}${PS1_BREAK}") "
 
   PS2="${shigh} > "
 }
