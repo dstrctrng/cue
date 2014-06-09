@@ -19,7 +19,7 @@ function default_theme {
   fi
 
   PS1="${PS1}
-$(eval echo "${PS1_START}${PS1_BREAK}") "
+$(eval echo "${PS1_START} ${PS1_BREAK}") "
 
   PS2="${shigh} > "
 }
